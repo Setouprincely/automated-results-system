@@ -1,19 +1,41 @@
-// pages/register.js
+// src/app/auth/Register/page.tsx
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ Correct for app/
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Head from 'next/head';
 import { Eye, EyeOff, User, Mail, Lock, School, Calendar } from 'lucide-react';
 
 export default function Register() {
   const router = useRouter();
-  const [language, setLanguage] = useState('en');
-  const [userType, setUserType] = useState('student');
+  const [language, setLanguage] = useState<'en' | 'fr'>('en');
+  const [userType, setUserType] = useState<'student' | 'teacher' | 'examiner'>('student');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+
+  interface FormData {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    school: string;
+    dateOfBirth: string;
+    candidateNumber: string;
+    userType: 'student' | 'teacher' | 'examiner';
+  }
+
+  interface FormErrors {
+    fullName?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    school?: string;
+    dateOfBirth?: string;
+    candidateNumber?: string;
+    form?: string;
+  }
+
+  const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
     password: '',
@@ -23,9 +45,33 @@ export default function Register() {
     candidateNumber: '',
     userType: 'student',
   });
-  const [errors, setErrors] = useState({});
 
-  const translations = {
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  interface Translation {
+    title: string;
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    school: string;
+    dateOfBirth: string;
+    candidateNumber: string;
+    register: string;
+    alreadyHaveAccount: string;
+    login: string;
+    userType: string;
+    student: string;
+    teacher: string;
+    examiner: string;
+    passwordRequirements: string;
+    registrationError: string;
+    passwordMismatch: string;
+    requiredField: string;
+    invalidEmail: string;
+  }
+
+  const translations: Record<'en' | 'fr', Translation> = {
     en: {
       title: 'Registration',
       fullName: 'Full Name',
@@ -74,15 +120,15 @@ export default function Register() {
 
   const t = translations[language];
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
-    
+
     // Clear error when field is being edited
-    if (errors[name]) {
+    if (errors[name as keyof FormErrors]) {
       setErrors({
         ...errors,
         [name]: ''
@@ -91,56 +137,59 @@ export default function Register() {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    
+    const newErrors: FormErrors = {};
+
     // Validate required fields
     if (!formData.fullName) newErrors.fullName = t.requiredField;
     if (!formData.email) newErrors.email = t.requiredField;
     if (!formData.password) newErrors.password = t.requiredField;
     if (!formData.confirmPassword) newErrors.confirmPassword = t.requiredField;
-    
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = t.invalidEmail;
     }
-    
+
     // Validate password strength
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (formData.password && !passwordRegex.test(formData.password)) {
       newErrors.password = t.passwordRequirements;
     }
-    
+
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = t.passwordMismatch;
     }
-    
+
     // Student-specific validations
     if (userType === 'student') {
       if (!formData.dateOfBirth) newErrors.dateOfBirth = t.requiredField;
       if (!formData.candidateNumber) newErrors.candidateNumber = t.requiredField;
     }
-    
+
     // School/Teacher-specific validations
     if (userType === 'teacher') {
       if (!formData.school) newErrors.school = t.requiredField;
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Set the user type in the form data
-    formData.userType = userType;
-    
+    setFormData(prev => ({
+      ...prev,
+      userType
+    }));
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
-    
+
     try {
       // API call would go here
       // const response = await fetch('/api/register', {
@@ -148,13 +197,13 @@ export default function Register() {
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(formData)
       // });
-      
+
       // Mock API response
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Simulate successful registration
       console.log('Registration form submitted:', formData);
-      
+
       // Redirect to verification page or login page
       router.push('/registration-success');
     } catch (error) {
@@ -166,29 +215,23 @@ export default function Register() {
   };
 
   return (
-    <>
-      <Head>
-        <title>GCE Cameroon - {t.title}</title>
-        <meta name="description" content="Register for the GCE Examination System" />
-      </Head>
-      
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center">
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex justify-end mb-4 mx-4">
-            <button 
-              onClick={() => setLanguage('en')} 
+            <button
+              onClick={() => setLanguage('en')}
               className={`px-3 py-1 rounded ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
             >
               EN
             </button>
-            <button 
-              onClick={() => setLanguage('fr')} 
+            <button
+              onClick={() => setLanguage('fr')}
               className={`px-3 py-1 rounded ml-2 ${language === 'fr' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
             >
               FR
             </button>
           </div>
-          
+
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900">{t.title}</h2>
             <p className="mt-2 text-sm text-gray-600">
@@ -491,6 +534,5 @@ export default function Register() {
           </div>
         </div>
       </div>
-    </>
   );
 }

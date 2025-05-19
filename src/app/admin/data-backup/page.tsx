@@ -1,21 +1,35 @@
-// pages/admin/data-backup-restore.js
+// src/app/admin/data-backup/page.tsx
 "use client";
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { 
-  Save, Database, DownloadCloud, UploadCloud, 
-  RefreshCw, CheckCircle, AlertCircle, Calendar 
+import {
+  Save, Database, DownloadCloud, UploadCloud,
+  RefreshCw, CheckCircle, AlertCircle, Calendar
 } from 'lucide-react';
 import Layout from '@/components/layouts/layout';
 
+// Define interfaces for type safety
+interface Backup {
+  id: number;
+  name: string;
+  date: string;
+  size: string;
+  type: string;
+  status: string;
+}
+
+interface Message {
+  type: 'success' | 'error' | 'info';
+  text: string;
+}
+
 export default function DataBackupRestore() {
-  const [backups, setBackups] = useState([]);
+  const [backups, setBackups] = useState<Backup[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [selectedBackup, setSelectedBackup] = useState(null);
+  const [message, setMessage] = useState<Message | null>(null);
+  const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupProgress, setBackupProgress] = useState(0);
   const [restoreProgress, setRestoreProgress] = useState(0);
-  const [backupType, setBackupType] = useState('full');
+  const [backupType, setBackupType] = useState<'full' | 'incremental' | 'examination' | 'configuration'>('full');
 
   useEffect(() => {
     // Fetch backup history from API
@@ -40,7 +54,7 @@ export default function DataBackupRestore() {
   const createBackup = async () => {
     setMessage({ type: 'info', text: 'Creating backup...' });
     setBackupProgress(0);
-    
+
     // Simulate backup process
     const interval = setInterval(() => {
       setBackupProgress(prev => {
@@ -57,10 +71,10 @@ export default function DataBackupRestore() {
 
   const restoreBackup = async () => {
     if (!selectedBackup) return;
-    
+
     setMessage({ type: 'info', text: `Restoring backup from ${selectedBackup.date}...` });
     setRestoreProgress(0);
-    
+
     // Simulate restore process
     const interval = setInterval(() => {
       setRestoreProgress(prev => {
@@ -74,9 +88,9 @@ export default function DataBackupRestore() {
     }, 300);
   };
 
-  const downloadBackup = (backup) => {
+  const downloadBackup = (backup: Backup) => {
     setMessage({ type: 'info', text: `Preparing ${backup.name} for download...` });
-    
+
     // Simulate download preparation
     setTimeout(() => {
       setMessage({ type: 'success', text: 'Backup downloaded successfully!' });
@@ -85,29 +99,25 @@ export default function DataBackupRestore() {
 
   return (
     <Layout>
-      <Head>
-        <title>Data Backup & Restore | GCE System</title>
-      </Head>
-      
-      <div className="px-6 py-8 bg-gray-50 min-h-screen">
+      <div className="px-6 py-8 bg-gray-100 min-h-screen">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Data Backup & Restore</h1>
           <p className="text-gray-600 mt-2">Manage system backups and recovery operations</p>
         </div>
-        
+
         {message && (
           <div className={`mb-6 p-4 rounded-lg flex items-center ${
             message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' :
             message.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
             'bg-blue-50 text-blue-700 border border-blue-200'
           }`}>
-            {message.type === 'success' ? <CheckCircle className="w-5 h-5 mr-2" /> : 
+            {message.type === 'success' ? <CheckCircle className="w-5 h-5 mr-2" /> :
              message.type === 'error' ? <AlertCircle className="w-5 h-5 mr-2" /> :
              <RefreshCw className="w-5 h-5 mr-2 animate-spin" />}
             <span>{message.text}</span>
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Backup Options */}
           <div className="lg:col-span-1 bg-white rounded-xl shadow p-6">
@@ -115,13 +125,13 @@ export default function DataBackupRestore() {
               <Save className="w-5 h-5 mr-2 text-blue-600" />
               Create Backup
             </h2>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Backup Type</label>
-              <select 
+              <select
                 className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 value={backupType}
-                onChange={(e) => setBackupType(e.target.value)}
+                onChange={(e) => setBackupType(e.target.value as 'full' | 'incremental' | 'examination' | 'configuration')}
               >
                 <option value="full">Full Backup</option>
                 <option value="incremental">Incremental Backup</option>
@@ -129,19 +139,19 @@ export default function DataBackupRestore() {
                 <option value="configuration">System Configuration Only</option>
               </select>
             </div>
-            
+
             {backupProgress > 0 && backupProgress < 100 && (
               <div className="mb-4">
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                     style={{ width: `${backupProgress}%` }}
                   ></div>
                 </div>
                 <p className="text-sm text-gray-600 mt-1 text-right">{backupProgress}%</p>
               </div>
             )}
-            
+
             <button
               onClick={createBackup}
               disabled={backupProgress > 0 && backupProgress < 100}
@@ -151,23 +161,29 @@ export default function DataBackupRestore() {
               Start Backup
             </button>
           </div>
-          
+
           {/* Restore Options */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <RefreshCw className="w-5 h-5 mr-2 text-indigo-600" />
               Restore System
             </h2>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Select Backup to Restore</label>
-              <select 
+              <select
                 className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 value={selectedBackup?.id || ''}
                 onChange={(e) => {
+                  if (e.target.value === "") {
+                    setSelectedBackup(null);
+                    return;
+                  }
                   const id = parseInt(e.target.value);
                   const backup = backups.find(b => b.id === id);
-                  setSelectedBackup(backup);
+                  if (backup) {
+                    setSelectedBackup(backup);
+                  }
                 }}
               >
                 <option value="">Select a backup</option>
@@ -178,19 +194,19 @@ export default function DataBackupRestore() {
                 ))}
               </select>
             </div>
-            
+
             {restoreProgress > 0 && restoreProgress < 100 && (
               <div className="mb-4">
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
                     style={{ width: `${restoreProgress}%` }}
                   ></div>
                 </div>
                 <p className="text-sm text-gray-600 mt-1 text-right">{restoreProgress}%</p>
               </div>
             )}
-            
+
             <div className="flex space-x-3">
               <button
                 onClick={restoreBackup}
@@ -200,7 +216,7 @@ export default function DataBackupRestore() {
                 <UploadCloud className="w-4 h-4 mr-2" />
                 Restore System
               </button>
-              
+
               <button
                 onClick={() => selectedBackup && downloadBackup(selectedBackup)}
                 disabled={!selectedBackup}
@@ -211,7 +227,7 @@ export default function DataBackupRestore() {
               </button>
             </div>
           </div>
-          
+
           {/* Backup History */}
           <div className="lg:col-span-3 bg-white rounded-xl shadow overflow-hidden">
             <div className="p-6 pb-4 border-b border-gray-200">
@@ -220,7 +236,7 @@ export default function DataBackupRestore() {
                 Backup History
               </h2>
             </div>
-            
+
             <div className="overflow-x-auto">
               {loading ? (
                 <div className="p-8 text-center text-gray-500">
@@ -247,21 +263,21 @@ export default function DataBackupRestore() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{backup.size}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{backup.type}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${backup.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                              backup.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' : 
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                            ${backup.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              backup.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-red-100 text-red-800'}`}>
                             {backup.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button 
+                          <button
                             onClick={() => downloadBackup(backup)}
                             className="text-indigo-600 hover:text-indigo-900 mr-3"
                           >
                             Download
                           </button>
-                          <button 
+                          <button
                             onClick={() => {
                               setSelectedBackup(backup);
                               window.scrollTo({ top: 0, behavior: 'smooth' });

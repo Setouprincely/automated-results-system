@@ -220,7 +220,7 @@ export default function Login() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  <Link href="/auth/register" className="font-medium text-blue-600 hover:text-blue-500">
+                  <Link href="/Registration" className="font-medium text-blue-600 hover:text-blue-500">
                     {t.register}
                   </Link>
                 </span>
