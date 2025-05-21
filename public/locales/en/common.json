@@ -1,0 +1,22 @@
+{
+  "scoreEntry": {
+    "title": "Score Entry",
+    "subject": "Select Subject",
+    "center": "Select Examination Center",
+    "candidateName": "Candidate Name",
+    "registrationNumber": "Registration Number",
+    "score": "Score (0-100)",
+    "actions": "Actions",
+    "submitScores": "Submit Scores",
+    "noCandidates": "No candidates available for the selected subject and center.",
+    "error": {
+      "fetchCandidates": "Failed to fetch candidates. Please try again.",
+      "invalidScore": "Scores must be between 0 and 100.",
+      "incompleteScores": "Please enter scores for all candidates.",
+      "submitScores": "Failed to submit scores. Please try again."
+    },
+    "success": {
+      "scoresSubmitted": "Scores submitted successfully!"
+    }
+  }
+}

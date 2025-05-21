@@ -44,7 +44,7 @@ import {
   Cell
 } from 'recharts';
 import { Download, FileText, Filter, Search, Share2 } from 'lucide-react';
-import Layout from '@/components/layouts/layout';
+import DashboardLayout from '@/components/layouts/layout';
 
 interface Student {
   id: string;
@@ -244,7 +244,7 @@ export default function SchoolResultsPage() {
   };
 
   return (
-    <Layout>
+    <DashboardLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
@@ -557,6 +557,6 @@ export default function SchoolResultsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 }

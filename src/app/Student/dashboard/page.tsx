@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Layout from '@/components/layouts/layout';
+import DashboardLayout from '@/components/layouts/layout';
 import {
   Card,
   CardContent,
@@ -96,7 +96,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <Layout>
+    <DashboardLayout>
       <div className="flex flex-col gap-6 p-6">
         {/* Header with language toggle and profile banner */}
         <div className="flex justify-between items-center">
@@ -709,7 +709,7 @@ const StudentDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 }
 

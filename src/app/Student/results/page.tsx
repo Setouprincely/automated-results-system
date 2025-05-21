@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import DashboardLayout from '@/components/layouts/layout';
 import {
   Card,
   CardContent,
@@ -164,19 +164,19 @@ export default function StudentResults() {
 
   if (loading) {
     return (
-      <Layout>
+      <DashboardLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-lg font-medium">{t.loading}</p>
           </div>
         </div>
-      </Layout>
+      </DashboardLayout>
     );
   }
 
   return (
-    <Layout>
+    <DashboardLayout>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{t.pageTitle}</h1>
@@ -415,6 +415,6 @@ export default function StudentResults() {
           </Card>
         )}
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 }

@@ -1,0 +1,22 @@
+{
+  "scoreEntry": {
+    "title": "Saisie des Notes",
+    "subject": "Sélectionner la Matière",
+    "center": "Sélectionner le Centre d'Examen",
+    "candidateName": "Nom du Candidat",
+    "registrationNumber": "Numéro d'Inscription",
+    "score": "Note (0-100)",
+    "actions": "Actions",
+    "submitScores": "Soumettre les Notes",
+    "noCandidates": "Aucun candidat disponible pour la matière et le centre sélectionnés.",
+    "error": {
+      "fetchCandidates": "Échec de la récupération des candidats. Veuillez réessayer.",
+      "invalidScore": "Les notes doivent être comprises entre 0 et 100.",
+      "incompleteScores": "Veuillez entrer les notes pour tous les candidats.",
+      "submitScores": "Échec de la soumission des notes. Veuillez réessayer."
+    },
+    "success": {
+      "scoresSubmitted": "Notes soumises avec succès !"
+    }
+  }
+}
