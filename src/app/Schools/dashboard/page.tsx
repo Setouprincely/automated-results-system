@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import SchoolsLayout from '@/components/layouts/SchoolsLayout';
 import {
   BarChart, Users, BookOpen,
   CheckCircle, AlertCircle, Download, FileText
@@ -145,16 +145,16 @@ export default function SchoolDashboard() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <SchoolsLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      </Layout>
+      </SchoolsLayout>
     );
   }
 
   return (
-    <Layout>
+    <SchoolsLayout>
       <div className="bg-gray-50 min-h-screen p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -485,6 +485,6 @@ export default function SchoolDashboard() {
           </div>
         )}
       </div>
-    </Layout>
+    </SchoolsLayout>
   );
 }

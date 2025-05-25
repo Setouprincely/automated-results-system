@@ -6,189 +6,175 @@ import { usePathname } from 'next/navigation';
 import {
   Menu,
   X,
+  Home,
+  ClipboardList,
+  FileCheck,
+  BarChart3,
+  CheckCircle,
   Search,
   Bell,
   User,
-  LogOut,
   Settings,
-  HelpCircle,
-  Home,
-  Users,
-  FileText,
-  Shield,
-  ChevronDown,
-  Sun,
+  LogOut,
   Moon,
-  Info,
-  Server,
-  BookOpen,
+  Sun,
   Globe,
-  BarChart3
+  Timer,
+  Award,
+  TrendingUp,
+  Activity,
+  BookOpen,
+  Target,
+  Zap,
+  ChevronDown,
+  ChevronRight,
+  Bookmark,
+  Calendar,
+  Clock,
+  MessageSquare,
+  HelpCircle,
+  Download,
+  Upload,
+  Filter,
+  SortAsc,
+  Eye,
+  Edit,
+  Save,
+  RefreshCw,
+  AlertCircle,
+  CheckSquare,
+  FileText,
+  PieChart,
+  BarChart,
+  LineChart
 } from 'lucide-react';
 
-interface AdminLayoutProps {
+interface ExaminerLayoutProps {
   children: React.ReactNode;
 }
 
-/**
- * Admin layout component with sidebar navigation, dark mode toggle, notifications, and user menu
- */
-export default function AdminLayout({ children }: AdminLayoutProps) {
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<any>;
+  current: boolean;
+  subitems?: { name: string; href: string }[];
+}
+
+interface Notification {
+  id: number;
+  content: string;
+  time: string;
+  read: boolean;
+  type: 'info' | 'warning' | 'success' | 'error';
+}
+
+export default function ExaminerLayout({ children }: ExaminerLayoutProps) {
   const pathname = usePathname() || '';
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
-  const [expandedSections, setExpandedSections] = useState<string[]>(['examinations', 'management', 'system']);
-  const [notifications, setNotifications] = useState([
-    { id: 1, content: 'New user registered', time: '5 min ago', read: false },
-    { id: 2, content: 'System update scheduled', time: '1 hour ago', read: false },
-    { id: 3, content: 'Backup completed successfully', time: '3 hours ago', read: true },
+  const [expandedSections, setExpandedSections] = useState<string[]>(['marking', 'performance']);
+  const [notifications, setNotifications] = useState<Notification[]>([
+    { id: 1, content: 'New script assigned for marking', time: '5 min ago', read: false, type: 'info' },
+    { id: 2, content: 'Deadline approaching for Mathematics scripts', time: '1 hour ago', read: false, type: 'warning' },
+    { id: 3, content: 'Performance report generated', time: '2 hours ago', read: true, type: 'success' },
   ]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
 
-  // Translation helper function
-  const t = (en: string, fr: string) => language === 'en' ? en : fr;
+  // Helper function for translations
+  const t = (en: string, fr: string) => (language === 'en' ? en : fr);
 
-  // Toggle language function
-  const handleLanguageToggle = () => {
-    setLanguage(prev => prev === 'en' ? 'fr' : 'en');
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
-  // Toggle section expansion
+  // Handle language toggle
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'en' ? 'fr' : 'en');
+  };
+
+  // Toggle expanded sections
   const toggleSection = (sectionName: string) => {
     setExpandedSections(prev =>
       prev.includes(sectionName)
-        ? prev.filter(s => s !== sectionName)
+        ? prev.filter(name => name !== sectionName)
         : [...prev, sectionName]
     );
   };
 
-  // Toggle dark mode and save preference
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
-    }
-  };
-
-  // Check for saved dark mode preference on mount
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setDarkMode(savedDarkMode);
-    if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  // Check screen size and adjust sidebar on mount and resize
-  useEffect(() => {
-    const handleResize = () => {
-      setSidebarOpen(window.innerWidth >= 1024);
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Navigation items with nested subitems
-  const navigation = [
+  // Navigation structure matching AdminLayout pattern
+  const navigation: NavigationItem[] = [
     {
       name: t('Dashboard', 'Tableau de Bord'),
-      href: '/admin/dashboard',
+      href: '/Examinar/dashboard',
       icon: Home,
-      current: pathname === '/admin/dashboard'
+      current: pathname === '/Examinar/dashboard'
     },
     {
-      name: t('User Management', 'Gestion des Utilisateurs'),
-      href: '/admin/user',
-      icon: Users,
-      current: pathname.includes('/admin/user'),
+      name: t('Script Marking', 'Correction de Copies'),
+      href: '#',
+      icon: ClipboardList,
+      current: pathname.includes('/Examinar/marking'),
       subitems: [
-        { name: t('All Users', 'Tous les Utilisateurs'), href: '/admin/user' },
-        { name: t('Roles & Permissions', 'Rôles et Permissions'), href: '/admin/roles' },
-        { name: t('User Activity', 'Activité des Utilisateurs'), href: '/admin/user-activity' }
+        { name: t('Active Scripts', 'Copies Actives'), href: '/Examinar/marking' },
+        { name: t('Quick Mark', 'Correction Rapide'), href: '/Examinar/marking/quick' },
+        { name: t('Batch Processing', 'Traitement par Lot'), href: '/Examinar/marking/batch' }
       ]
     },
     {
-      name: t('Examinations', 'Examens'),
+      name: t('All Scripts', 'Toutes les Copies'),
       href: '#',
       icon: FileText,
-      current: pathname.includes('/Examination') || pathname.includes('/admin/examination'),
+      current: pathname.includes('/Examinar/scripts'),
       subitems: [
-        { name: t('Exam Setup', 'Configuration d\'Examen'), href: '/Examination/Examsetup' },
-        { name: t('Exam Centers', 'Centres d\'Examen'), href: '/Examination/Centers' },
-        { name: t('Subject Management', 'Gestion des Matières'), href: '/Examination/Subjectmanagement' }
+        { name: t('All Scripts', 'Toutes les Copies'), href: '/Examinar/scripts' },
+        { name: t('Pending Review', 'En Attente de Révision'), href: '/Examinar/scripts/pending' },
+        { name: t('Completed', 'Terminées'), href: '/Examinar/scripts/completed' }
       ]
     },
     {
-      name: t('Management', 'Gestion'),
+      name: t('Verification', 'Vérification'),
       href: '#',
-      icon: BookOpen,
-      current: pathname.includes('/management'),
+      icon: FileCheck,
+      current: pathname.includes('/Examinar/verification'),
       subitems: [
-        { name: t('Question Papers', 'Sujets d\'Examen'), href: '/management/question' },
-        { name: t('Materials', 'Matériels'), href: '/management/materials' },
-        { name: t('Attendance', 'Présence'), href: '/management/attendance' },
-        { name: t('Invigilators', 'Surveillants'), href: '/management/invigilator' }
+        { name: t('Quality Check', 'Contrôle Qualité'), href: '/Examinar/verification' },
+        { name: t('Cross Verification', 'Vérification Croisée'), href: '/Examinar/verification/cross' }
       ]
     },
     {
-      name: t('System', 'Système'),
+      name: t('Performance', 'Performance'),
       href: '#',
-      icon: Server,
-      current: pathname.includes('/admin/system') || pathname.includes('/admin/data-backup') || pathname.includes('/admin/logs'),
-      subitems: [
-        { name: t('Configuration', 'Configuration'), href: '/admin/system-configuration' },
-        { name: t('Monitoring', 'Surveillance'), href: '/admin/system-monitoring' },
-        { name: t('Backup & Restore', 'Sauvegarde et Restauration'), href: '/admin/data-backup' },
-        { name: t('Logs & Audit', 'Journaux et Audit'), href: '/admin/logs-audit' }
-      ]
-    },
-    {
-      name: t('Analytics', 'Analytiques'),
-      href: '/admin/analytics',
       icon: BarChart3,
-      current: pathname === '/admin/analytics'
+      current: pathname.includes('/Examinar/performance'),
+      subitems: [
+        { name: t('Overview', 'Aperçu'), href: '/Examinar/performance' },
+        { name: t('Analytics', 'Analytiques'), href: '/Examinar/performance/analytics' },
+        { name: t('Reports', 'Rapports'), href: '/Examinar/performance/reports' }
+      ]
     },
     {
-      name: t('Security', 'Sécurité'),
-      href: '/admin/security',
-      icon: Shield,
-      current: pathname === '/admin/security'
-    },
+      name: t('Score Analysis', 'Analyse des Notes'),
+      href: '#',
+      icon: Award,
+      current: pathname.includes('/Examinar/score'),
+      subitems: [
+        { name: t('Score Analysis', 'Analyse des Notes'), href: '/Examinar/score' },
+        { name: t('Grade Distribution', 'Distribution des Notes'), href: '/Examinar/score/distribution' }
+      ]
+    }
   ];
 
   // Mark all notifications as read
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
-  };
-
-  // Get the current date and time
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return now.toLocaleDateString('en-US', options);
   };
 
   // Handle global search
@@ -236,6 +222,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [sidebarOpen, darkMode]);
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -249,7 +237,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         >
           <div className="h-full flex flex-col">
             {/* Header with logo and toggle */}
-            <div className={`flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800`}>
+            <div className={`flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-600 to-indigo-700 dark:from-purple-700 dark:to-indigo-800`}>
               <div className="flex items-center">
                 <div className="relative">
                   <img className="h-8 w-auto transition-transform duration-300 hover:scale-110" src="/images/GCEB.png" alt="GCE System" />
@@ -257,7 +245,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
                 {sidebarOpen && (
                   <span className="ml-3 text-lg font-bold text-white transition-all duration-300 transform">
-                    {t('GCE Admin', 'Admin GCE')}
+                    {t('GCE Examiner', 'Examinateur GCE')}
                   </span>
                 )}
               </div>
@@ -272,11 +260,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
             {/* Quick stats bar */}
             {sidebarOpen && (
-              <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
+              <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-gray-600 dark:text-gray-300">{t('System Online', 'Système En Ligne')}</span>
+                    <span className="text-gray-600 dark:text-gray-300">{t('Examiner Online', 'Examinateur En Ligne')}</span>
                   </div>
                   <div className="text-gray-500 dark:text-gray-400">
                     {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -303,12 +291,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                           onClick={() => toggleSection(sectionKey)}
                           className={`${
                             isActive
-                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg transform scale-105'
                               : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 dark:text-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-600'
                           } ${sidebarOpen ? 'justify-between' : 'justify-center'} group flex items-center w-full px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-md relative overflow-hidden`}
                         >
                           {/* Animated background */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/10 group-hover:to-blue-600/10 transition-all duration-300"></div>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/0 to-indigo-600/0 group-hover:from-purple-400/10 group-hover:to-indigo-600/10 transition-all duration-300"></div>
 
                           <div className="flex items-center relative z-10">
                             <div className="relative">
@@ -322,7 +310,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             )}
                           </div>
                           {sidebarOpen && (
-                            <ChevronDown className={`h-4 w-4 transition-all duration-300 transform ${isExpanded ? 'rotate-180 text-blue-300' : ''} relative z-10`} />
+                            <ChevronDown className={`h-4 w-4 transition-all duration-300 transform ${isExpanded ? 'rotate-180 text-purple-300' : ''} relative z-10`} />
                           )}
 
                           {/* Active indicator */}
@@ -335,12 +323,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                           href={item.href}
                           className={`${
                             isActive
-                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg transform scale-105'
                               : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 dark:text-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-600'
                           } ${sidebarOpen ? 'justify-start' : 'justify-center'} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-md relative overflow-hidden`}
                         >
                           {/* Animated background */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/10 group-hover:to-blue-600/10 transition-all duration-300"></div>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/0 to-indigo-600/0 group-hover:from-purple-400/10 group-hover:to-indigo-600/10 transition-all duration-300"></div>
 
                           <div className="relative z-10">
                             <item.icon className={`${sidebarOpen ? 'mr-3' : ''} flex-shrink-0 h-5 w-5 transition-all duration-200 ${isActive ? 'animate-pulse' : ''}`} aria-hidden="true" />
@@ -369,7 +357,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 href={subitem.href}
                                 className={`${
                                   pathname === subitem.href
-                                    ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/30 dark:text-blue-400'
+                                    ? 'bg-purple-50 text-purple-600 border-l-2 border-purple-500 dark:bg-purple-900/30 dark:text-purple-400'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200'
                                 } block px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 transform hover:translate-x-1 hover:shadow-sm relative`}
                                 style={{ animationDelay: `${subIndex * 30}ms` }}
@@ -379,7 +367,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                   {subitem.name}
                                 </div>
                                 {pathname === subitem.href && (
-                                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                                 )}
                               </Link>
                             ))}
@@ -402,15 +390,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md group"
                   >
                     <div className="relative">
-                      <Globe className="mr-3 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+                      <Globe className="mr-3 h-5 w-5 text-gray-400 group-hover:text-purple-500 transition-colors duration-200" />
                       <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     </div>
-                    <span className="group-hover:text-blue-600 transition-colors duration-200">
+                    <span className="group-hover:text-purple-600 transition-colors duration-200">
                       {language === 'en' ? 'Français' : 'English'}
                     </span>
                     <div className="ml-auto">
                       <div className="w-6 h-3 bg-gray-300 rounded-full relative">
-                        <div className={`w-3 h-3 bg-blue-500 rounded-full absolute transition-transform duration-300 ${language === 'en' ? 'translate-x-0' : 'translate-x-3'}`}></div>
+                        <div className={`w-3 h-3 bg-purple-500 rounded-full absolute transition-transform duration-300 ${language === 'en' ? 'translate-x-0' : 'translate-x-3'}`}></div>
                       </div>
                     </div>
                   </button>
@@ -418,16 +406,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   {/* User Profile */}
                   <div className="flex items-center p-3 bg-white dark:bg-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105 group cursor-pointer">
                     <div className="flex-shrink-0 relative">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-all duration-200">
-                        <span className="font-medium text-sm">AD</span>
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-all duration-200">
+                        <span className="font-medium text-sm">DN</span>
                       </div>
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
                     </div>
                     <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-600 transition-colors duration-200">
-                        {t('Admin User', 'Utilisateur Admin')}
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-600 transition-colors duration-200">
+                        {t('Dr. Nkeng', 'Dr. Nkeng')}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">admin@gce.cm</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('Mathematics Examiner', 'Examinateur de Mathématiques')}</p>
                     </div>
                     <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -442,13 +430,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 transform hover:scale-110 group"
                     title={language === 'en' ? 'Switch to Français' : 'Switch to English'}
                   >
-                    <Globe className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+                    <Globe className="h-5 w-5 text-gray-400 group-hover:text-purple-500 transition-colors duration-200" />
                   </button>
 
                   {/* Collapsed User Profile */}
                   <div className="relative group cursor-pointer">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-all duration-200 transform group-hover:scale-110">
-                      <span className="font-medium text-xs">AD</span>
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-all duration-200 transform group-hover:scale-110">
+                      <span className="font-medium text-xs">DN</span>
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
@@ -477,8 +465,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                 <div className="flex-shrink-0 flex items-center px-4">
                   <img className="h-8 w-auto" src="/images/GCEB.png" alt="GCE System" />
-                  <span className="ml-2 text-lg font-bold text-blue-600 dark:text-blue-400">
-                    {t('GCE Admin', 'Admin GCE')}
+                  <span className="ml-2 text-lg font-bold text-purple-600 dark:text-purple-400">
+                    {t('GCE Examiner', 'Examinateur GCE')}
                   </span>
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
@@ -491,7 +479,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                           href={item.href}
                           className={`${
                             isActive
-                              ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                              ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
                               : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                           } group flex items-center px-3 py-2 text-base font-medium rounded-md`}
                         >
@@ -508,7 +496,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 href={subitem.href}
                                 className={`${
                                   pathname === subitem.href
-                                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                                    ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
                                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                                 } block px-3 py-2 text-sm font-medium rounded-md`}
                               >
@@ -526,13 +514,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                      <span className="font-medium text-sm">AD</span>
+                    <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center text-white">
+                      <span className="font-medium text-sm">DN</span>
                     </div>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Admin User</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">admin@example.com</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Dr. Nkeng</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Mathematics Examiner</p>
                   </div>
                 </div>
               </div>
@@ -548,7 +536,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Enhanced Top navigation */}
           <header className="bg-white dark:bg-gray-800 shadow-lg z-10 relative overflow-hidden">
             {/* Animated background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-indigo-50/30 to-purple-50/30 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-50/30 via-indigo-50/30 to-blue-50/30 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"></div>
 
             <div className="relative z-10 h-16 flex items-center justify-between px-4 sm:px-6">
               <div className="flex items-center space-x-4">
@@ -571,26 +559,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         (item.subitems && item.subitems.some(sub => sub.href === pathname))
                       )?.name || t('Dashboard', 'Tableau de Bord')}
                     </h1>
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                   </div>
                 </div>
 
                 {/* Enhanced Search bar */}
                 <form onSubmit={handleSearch} className="hidden md:block ml-4">
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-indigo-400/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className={`h-5 w-5 transition-colors duration-200 ${searchFocused ? 'text-blue-500' : 'text-gray-400'}`} aria-hidden="true" />
+                        <Search className={`h-5 w-5 transition-colors duration-200 ${searchFocused ? 'text-purple-500' : 'text-gray-400'}`} aria-hidden="true" />
                       </div>
                       <input
                         type="text"
-                        placeholder={t('Search admin panel...', 'Rechercher dans le panneau admin...')}
+                        placeholder={t('Search examiner panel...', 'Rechercher dans le panneau examinateur...')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => setSearchFocused(true)}
                         onBlur={() => setSearchFocused(false)}
-                        className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 transform focus:scale-105 shadow-sm focus:shadow-lg sm:text-sm"
+                        className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 transform focus:scale-105 shadow-sm focus:shadow-lg sm:text-sm"
                       />
                       {searchQuery && (
                         <button
@@ -610,7 +598,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {/* Enhanced Dark mode toggle */}
                 <button
                   onClick={toggleDarkMode}
-                  className="relative p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="relative p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   title={darkMode ? t('Switch to light mode', 'Passer en mode clair') : t('Switch to dark mode', 'Passer en mode sombre')}
                 >
                   <div className="relative">
@@ -629,8 +617,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   className="hidden lg:flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md group"
                   title={language === 'en' ? 'Switch to Français' : 'Switch to English'}
                 >
-                  <Globe className="mr-2 h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
-                  <span className="group-hover:text-blue-600 transition-colors duration-200">
+                  <Globe className="mr-2 h-4 w-4 text-gray-400 group-hover:text-purple-500 transition-colors duration-200" />
+                  <span className="group-hover:text-purple-600 transition-colors duration-200">
                     {language === 'en' ? 'FR' : 'EN'}
                   </span>
                 </button>
@@ -639,7 +627,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div className="relative">
                   <button
                     type="button"
-                    className="relative p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                    className="relative p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700 group"
                     onClick={() => {
                       setShowNotifications(!showNotifications);
                       setShowUserMenu(false);
@@ -647,114 +635,124 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     <span className="sr-only">View notifications</span>
                     <div className="relative">
-                      <Bell className="h-5 w-5 transition-transform duration-200 group-hover:animate-pulse" aria-hidden="true" />
-                      {notifications.some(n => !n.read) && (
-                        <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800 animate-ping"></span>
+                      <Bell className="h-5 w-5 transition-transform duration-200 group-hover:rotate-12" aria-hidden="true" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full animate-pulse">
+                          {unreadCount}
+                        </span>
                       )}
-                      {notifications.some(n => !n.read) && (
-                        <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
-                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-indigo-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                   </button>
 
-                  {/* Notifications panel */}
+                  {/* Enhanced Notifications dropdown */}
                   {showNotifications && (
-                    <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-700">
-                      <div className="py-2 px-4 flex justify-between items-center">
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Notifications</h3>
-                        <button
-                          onClick={markAllAsRead}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                        >
-                          Mark all as read
-                        </button>
-                      </div>
-                      <div className="max-h-60 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                          <p className="py-4 px-4 text-sm text-center text-gray-500 dark:text-gray-400">No notifications</p>
-                        ) : (
-                          notifications.map((notification) => (
-                            <div
-                              key={notification.id}
-                              className={`py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                                !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                              }`}
-                            >
-                              <p className="text-sm text-gray-900 dark:text-gray-100">{notification.content}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
-                            </div>
-                          ))
+                    <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 transform transition-all duration-200 scale-100 opacity-100">
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-t-xl">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            {t('Notifications', 'Notifications')}
+                          </h3>
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-sm text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium transition-colors duration-200"
+                          >
+                            {t('Mark all read', 'Tout marquer comme lu')}
+                          </button>
+                        </div>
+                        {unreadCount > 0 && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {t(`${unreadCount} unread notifications`, `${unreadCount} notifications non lues`)}
+                          </p>
                         )}
                       </div>
-                      <div className="py-2 px-4">
-                        <Link
-                          href="/admin/notifications"
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                        >
-                          View all notifications
-                        </Link>
+                      <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                        {notifications.map((notification, index) => (
+                          <div
+                            key={notification.id}
+                            className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-[1.02] ${
+                              !notification.read ? 'bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500' : ''
+                            }`}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className={`w-3 h-3 rounded-full mt-2 flex-shrink-0 ${
+                                notification.type === 'error' ? 'bg-red-500 animate-pulse' :
+                                notification.type === 'warning' ? 'bg-yellow-500 animate-pulse' :
+                                notification.type === 'success' ? 'bg-green-500' : 'bg-purple-500'
+                              }`} />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-gray-900 dark:text-gray-100 font-medium">{notification.content}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {notification.time}
+                                </p>
+                              </div>
+                              {!notification.read && (
+                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 rounded-b-xl">
+                        <button className="w-full text-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium transition-colors duration-200 py-2 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30">
+                          {t('View all notifications', 'Voir toutes les notifications')}
+                        </button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Enhanced Profile dropdown */}
+                {/* Enhanced User menu */}
                 <div className="relative">
                   <button
                     type="button"
-                    className="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-110 group"
+                    className="flex items-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl group"
                     onClick={() => {
                       setShowUserMenu(!showUserMenu);
                       setShowNotifications(false);
                     }}
                   >
-                    <span className="sr-only">Open user menu</span>
                     <div className="relative">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-all duration-200">
-                        <span className="font-medium text-sm">AD</span>
+                      <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
+                        <span className="text-sm font-bold">DN</span>
                       </div>
                       <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/0 to-purple-400/0 group-hover:from-blue-400/20 group-hover:to-purple-400/20 transition-all duration-300"></div>
                     </div>
+                    <div className="hidden md:block text-left">
+                      <p className="text-sm font-medium">Dr. Nkeng</p>
+                      <p className="text-xs opacity-75">{t('Examiner', 'Examinateur')}</p>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* User menu dropdown */}
+                  {/* User dropdown menu */}
                   {showUserMenu && (
-                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-700">
-                      <div className="py-2 px-4">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Admin User</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">admin@example.com</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 transform transition-all duration-200 scale-100 opacity-100">
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold">
+                            DN
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Dr. Nkeng</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('Mathematics Examiner', 'Examinateur de Mathématiques')}</p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="py-1">
-                        <Link
-                          href="/admin/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <User className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                          Profile
+                      <div className="py-2">
+                        <Link href="/Examinar/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                          <User className="mr-3 h-4 w-4" />
+                          {t('Profile', 'Profil')}
                         </Link>
-                        <Link
-                          href="/admin/settings"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <Settings className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                          Settings
+                        <Link href="/Examinar/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                          <Settings className="mr-3 h-4 w-4" />
+                          {t('Settings', 'Paramètres')}
                         </Link>
-                        <Link
-                          href="/admin/help"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <HelpCircle className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                          Help Center
-                        </Link>
-                      </div>
-                      <div className="py-1">
-                        <button
-                          onClick={() => alert('Logging out...')}
-                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <LogOut className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                          Sign out
+                        <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                          <LogOut className="mr-3 h-4 w-4" />
+                          {t('Sign out', 'Déconnexion')}
                         </button>
                       </div>
                     </div>
@@ -762,93 +760,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
               </div>
             </div>
-
-            {/* Breadcrumb and date/time */}
-            <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs">
-              <div className="flex items-center py-1">
-                <Link href="/admin/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
-                  Home
-                </Link>
-                <span className="mx-2 text-gray-500">/</span>
-                <span className="text-gray-900 dark:text-gray-100">User Management</span>
-              </div>
-              <div className="flex items-center py-1">
-                <span className="text-gray-500 dark:text-gray-400">{getCurrentDateTime()}</span>
-              </div>
-            </div>
           </header>
 
-          {/* Main content */}
-          <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+          {/* Page content */}
+          <main className="flex-1 overflow-y-auto p-6">
             {children}
           </main>
-
-          {/* Enhanced Floating Action Buttons */}
-          <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
-            {/* Help button */}
-            <div className="relative group">
-              <button
-                type="button"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-full text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-110 group"
-                onClick={() => alert('Help center opening...')}
-              >
-                <HelpCircle className="h-6 w-6 transition-transform duration-300 group-hover:rotate-12" />
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 to-purple-400/0 group-hover:from-blue-400/30 group-hover:to-purple-400/30 rounded-full transition-all duration-300"></div>
-              </button>
-              {/* Tooltip */}
-              <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                {t('Help & Support', 'Aide et Support')}
-                <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
-              </div>
-            </div>
-
-            {/* Quick Actions button */}
-            <div className="relative group">
-              <button
-                type="button"
-                className="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-full text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300 transform hover:scale-110 group"
-                onClick={() => alert('Quick actions menu...')}
-              >
-                <Settings className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
-              </button>
-              {/* Tooltip */}
-              <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                {t('Quick Actions', 'Actions Rapides')}
-                <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced System status indicator */}
-          <div className={`fixed bottom-6 transition-all duration-300 ${sidebarOpen ? 'left-72' : 'left-24'} lg:block hidden z-40`}>
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg flex items-center space-x-3 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:scale-105 group">
-              <div className="flex items-center space-x-2">
-                <div className="relative">
-                  <span className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></span>
-                  <span className="absolute inset-0 h-3 w-3 bg-green-500 rounded-full animate-ping opacity-75"></span>
-                </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('System Online', 'Système En Ligne')}
-                </span>
-              </div>
-              <button
-                onClick={() => alert('System status information')}
-                className="p-1 rounded-full text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all duration-200 transform hover:scale-110"
-              >
-                <Info className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile system status */}
-          <div className="fixed bottom-6 left-6 lg:hidden z-40">
-            <div className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
-              <div className="relative">
-                <span className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></span>
-                <span className="absolute inset-0 h-3 w-3 bg-green-500 rounded-full animate-ping opacity-75"></span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

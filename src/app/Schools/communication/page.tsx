@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
-import { 
-  MessageCircle, 
-  Send, 
-  File, 
-  Bell, 
-  Search, 
-  Paperclip, 
+import { useState } from 'react';
+import SchoolsLayout from '@/components/layouts/SchoolsLayout';
+import {
+  MessageCircle,
+  Send,
+  File,
+  Bell,
+  Search,
+  Paperclip,
   Download,
   ArrowLeft,
   ChevronDown,
@@ -117,11 +117,11 @@ export default function CommunicationPortal() {
   // Filter messages based on search term and selected filter
   const filteredMessages = messages.filter(message => {
     // Search filter
-    const matchesSearch = 
-      message.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      message.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
       message.sender.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Category filter
     let matchesFilter = true;
     if (selectedFilter === 'unread') {
@@ -129,21 +129,21 @@ export default function CommunicationPortal() {
     } else if (selectedFilter !== 'all') {
       matchesFilter = message.category === selectedFilter;
     }
-    
+
     return matchesSearch && matchesFilter;
   });
 
   // Sort messages by date (most recent first)
-  const sortedMessages = [...filteredMessages].sort((a, b) => 
+  const sortedMessages = [...filteredMessages].sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   const handleMessageClick = (message: Message) => {
     setSelectedMessage(message);
-    
+
     // Mark as read if it was unread
     if (!message.read) {
-      const updatedMessages = messages.map(m => 
+      const updatedMessages = messages.map(m =>
         m.id === message.id ? {...m, read: true} : m
       );
       setMessages(updatedMessages);
@@ -172,7 +172,7 @@ export default function CommunicationPortal() {
         size: `${Math.round(file.size / 1024)}KB`
       }))
     };
-    
+
     setMessages([newMsg, ...messages]);
     setNewMessage({ subject: '', content: '', attachments: [] });
     setComposeMode(false);
@@ -231,7 +231,7 @@ export default function CommunicationPortal() {
   };
 
   return (
-    <Layout>
+    <SchoolsLayout>
       <div className="flex flex-col h-screen max-h-screen bg-gray-50">
         <div className="flex items-center justify-between bg-blue-700 text-white p-4">
           <h1 className="text-xl font-bold">Communication Portal</h1>
@@ -263,14 +263,14 @@ export default function CommunicationPortal() {
                   <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
                 </div>
                 <div className="relative">
-                  <button 
+                  <button
                     className="flex items-center space-x-1 py-2 px-3 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
                     onClick={toggleFilterMenu}
                   >
                     <Filter className="w-4 h-4 text-gray-600" />
                     <ChevronDown className="w-4 h-4 text-gray-600" />
                   </button>
-                  
+
                   {showFilterMenu && (
                     <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                       <div className="py-1">
@@ -288,8 +288,8 @@ export default function CommunicationPortal() {
                   )}
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center space-x-2"
                 onClick={handleComposeClick}
               >
@@ -301,7 +301,7 @@ export default function CommunicationPortal() {
             <div className="flex-1 overflow-y-auto">
               {sortedMessages.length > 0 ? (
                 sortedMessages.map((message) => (
-                  <div 
+                  <div
                     key={message.id}
                     className={`border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors duration-150 ${!message.read ? 'bg-blue-50' : ''}`}
                     onClick={() => handleMessageClick(message)}
@@ -361,7 +361,7 @@ export default function CommunicationPortal() {
             ) : composeMode ? (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="flex items-center bg-white p-4 border-b border-gray-200">
-                  <button 
+                  <button
                     className="md:hidden mr-2 p-1 rounded-full hover:bg-gray-100"
                     onClick={handleBackClick}
                   >
@@ -423,7 +423,7 @@ export default function CommunicationPortal() {
                               <span className="text-sm">{file.name}</span>
                               <span className="text-xs text-gray-500 ml-2">({Math.round(file.size / 1024)}KB)</span>
                             </div>
-                            <button 
+                            <button
                               className="text-red-600 hover:text-red-800"
                               onClick={() => handleRemoveAttachment(index)}
                             >
@@ -457,7 +457,7 @@ export default function CommunicationPortal() {
             ) : selectedMessage && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="flex items-center bg-white p-4 border-b border-gray-200">
-                  <button 
+                  <button
                     className="md:hidden mr-2 p-1 rounded-full hover:bg-gray-100"
                     onClick={handleBackClick}
                   >
@@ -484,7 +484,7 @@ export default function CommunicationPortal() {
                         {capitalizeFirstLetter(selectedMessage.category)}
                       </span>
                     </div>
-                    
+
                     <div className="border-t border-gray-200 pt-4 mt-4">
                       <div className="prose max-w-none text-gray-800">
                         {selectedMessage.content.split('\n').map((paragraph, index) => (
@@ -492,14 +492,14 @@ export default function CommunicationPortal() {
                         ))}
                       </div>
                     </div>
-                    
+
                     {selectedMessage.hasAttachment && (
                       <div className="mt-6 border-t border-gray-200 pt-4">
                         <h4 className="font-medium text-gray-700 mb-3">Attachments ({selectedMessage.attachments.length})</h4>
                         <div className="space-y-2">
                           {selectedMessage.attachments.map((attachment, index) => (
-                            <div 
-                              key={index} 
+                            <div
+                              key={index}
                               className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
                             >
                               <div className="flex items-center">
@@ -545,12 +545,12 @@ export default function CommunicationPortal() {
                     </button>
                   </div>
                 </div>
-              </div>  
+              </div>
             )}
           </div>
         </div>
       </div>
-    </Layout>
+    </SchoolsLayout>
   );
 }
 

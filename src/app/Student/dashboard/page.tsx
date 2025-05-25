@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import DashboardLayout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import {
   Card,
   CardContent,
@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge';
 const studentInfo = {
   id: 'GCE2025-78956',
   name: 'Jean-Michel Fopa',
-  photo: '/api/placeholder/120/120', // Placeholder
+  photo: '/images/prince.jpg', // Student profile picture
   center: 'GBHS Limbe',
   level: 'Advanced Level (A Level)',
   registrationStatus: 'Confirmed',
@@ -96,7 +96,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <DashboardLayout>
+    <StudentLayout>
       <div className="flex flex-col gap-6 p-6">
         {/* Header with language toggle and profile banner */}
         <div className="flex justify-between items-center">
@@ -709,7 +709,7 @@ const StudentDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </StudentLayout>
   );
 }
 

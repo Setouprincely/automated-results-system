@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import { Calendar, Clock, MapPin, ArrowRight, Filter, Download, Bell } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,83 +31,81 @@ const ExamSchedulePage = () => {
 
   // Mock data - in a real application this would be fetched from an API
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        const mockExams: Exam[] = [
-          {
-            id: '1',
-            subject: 'Mathematics',
-            date: '2025-06-02',
-            startTime: '09:00',
-            endTime: '12:00',
-            duration: '3 hours',
-            location: 'Lycée Bilingue de Yaoundé',
-            centerCode: 'YDE001',
-            examType: 'O Level',
-            paperNumber: 'Paper 1',
-            paperTitle: 'Pure Mathematics'
-          },
-          {
-            id: '2',
-            subject: 'Physics',
-            date: '2025-06-04',
-            startTime: '13:00',
-            endTime: '16:00',
-            duration: '3 hours',
-            location: 'Lycée Bilingue de Yaoundé',
-            centerCode: 'YDE001',
-            examType: 'O Level',
-            paperNumber: 'Paper 2',
-            paperTitle: 'Mechanics & Electricity'
-          },
-          {
-            id: '3',
-            subject: 'English Language',
-            date: '2025-06-07',
-            startTime: '09:00',
-            endTime: '11:30',
-            duration: '2.5 hours',
-            location: 'Lycée Bilingue de Yaoundé',
-            centerCode: 'YDE001',
-            examType: 'O Level',
-            paperNumber: 'Paper 1',
-            paperTitle: 'Comprehension & Summary'
-          },
-          {
-            id: '4',
-            subject: 'Chemistry',
-            date: '2025-06-09',
-            startTime: '09:00',
-            endTime: '12:00',
-            duration: '3 hours',
-            location: 'Lycée Bilingue de Yaoundé',
-            centerCode: 'YDE001',
-            examType: 'A Level',
-            paperNumber: 'Paper 3',
-            paperTitle: 'Practical'
-          },
-          {
-            id: '5',
-            subject: 'Literature in English',
-            date: '2025-06-11',
-            startTime: '13:00',
-            endTime: '16:00',
-            duration: '3 hours',
-            location: 'Lycée Bilingue de Yaoundé',
-            centerCode: 'YDE001',
-            examType: 'A Level',
-            paperNumber: 'Paper 1',
-            paperTitle: 'Drama & Poetry'
-          }
-        ];
-        setExams(mockExams);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load exam schedule. Please try again later.');
-        setLoading(false);
-      }
-    }, 1000);
+    // Remove artificial delay for better performance
+    try {
+      const mockExams: Exam[] = [
+        {
+          id: '1',
+          subject: 'Mathematics',
+          date: '2025-06-02',
+          startTime: '09:00',
+          endTime: '12:00',
+          duration: '3 hours',
+          location: 'Lycée Bilingue de Yaoundé',
+          centerCode: 'YDE001',
+          examType: 'O Level',
+          paperNumber: 'Paper 1',
+          paperTitle: 'Pure Mathematics'
+        },
+        {
+          id: '2',
+          subject: 'Physics',
+          date: '2025-06-04',
+          startTime: '13:00',
+          endTime: '16:00',
+          duration: '3 hours',
+          location: 'Lycée Bilingue de Yaoundé',
+          centerCode: 'YDE001',
+          examType: 'O Level',
+          paperNumber: 'Paper 2',
+          paperTitle: 'Mechanics & Electricity'
+        },
+        {
+          id: '3',
+          subject: 'English Language',
+          date: '2025-06-07',
+          startTime: '09:00',
+          endTime: '11:30',
+          duration: '2.5 hours',
+          location: 'Lycée Bilingue de Yaoundé',
+          centerCode: 'YDE001',
+          examType: 'O Level',
+          paperNumber: 'Paper 1',
+          paperTitle: 'Comprehension & Summary'
+        },
+        {
+          id: '4',
+          subject: 'Chemistry',
+          date: '2025-06-09',
+          startTime: '09:00',
+          endTime: '12:00',
+          duration: '3 hours',
+          location: 'Lycée Bilingue de Yaoundé',
+          centerCode: 'YDE001',
+          examType: 'A Level',
+          paperNumber: 'Paper 3',
+          paperTitle: 'Practical'
+        },
+        {
+          id: '5',
+          subject: 'Literature in English',
+          date: '2025-06-11',
+          startTime: '13:00',
+          endTime: '16:00',
+          duration: '3 hours',
+          location: 'Lycée Bilingue de Yaoundé',
+          centerCode: 'YDE001',
+          examType: 'A Level',
+          paperNumber: 'Paper 1',
+          paperTitle: 'Drama & Poetry'
+        }
+      ];
+      setExams(mockExams);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load exam schedule. Please try again later.');
+      setLoading(false);
+    }
   }, []);
 
   // Functions for filtering exams
@@ -234,7 +232,7 @@ const ExamSchedulePage = () => {
   const t = translations[language];
 
   return (
-    <Layout>
+    <StudentLayout>
       <div className="bg-gray-50 min-h-screen pb-12">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-6 shadow-lg">
@@ -410,7 +408,7 @@ const ExamSchedulePage = () => {
           </div>
         </div>
       )}
-    </Layout>
+    </StudentLayout>
   );
 };
 

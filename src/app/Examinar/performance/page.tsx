@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -134,7 +134,7 @@ const PerformanceAnalytics = () => {
   }, [year, exam, region]);
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Performance Analytics</h1>
@@ -696,7 +696,7 @@ const PerformanceAnalytics = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </ExaminerLayout>
   );
 };
 

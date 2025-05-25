@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -110,27 +110,23 @@ const PerformanceAnalyticsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    // Remove artificial delay for better performance
+    setIsLoading(false);
   }, []);
 
   if (isLoading) {
     return (
-      <Layout>
+      <StudentLayout>
         <div className="flex flex-col items-center justify-center min-h-screen">
           <div className="w-16 h-16 border-4 border-t-blue-500 border-b-blue-700 rounded-full animate-spin"></div>
           <p className="mt-4 text-lg text-gray-600">Loading your performance data...</p>
         </div>
-      </Layout>
+      </StudentLayout>
     );
   }
 
   return (
-    <Layout>
+    <StudentLayout>
       <div className="p-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
           <div>
@@ -585,7 +581,7 @@ const PerformanceAnalyticsPage = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </StudentLayout>
   );
 };
 

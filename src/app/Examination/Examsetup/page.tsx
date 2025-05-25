@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/layouts/layout';
+import ExaminationLayout from '@/components/layouts/ExaminationLayout';
 import {
   AlertCircle,
   Calendar,
@@ -176,7 +176,7 @@ const ExaminationSetupPage = () => {
   };
 
   return (
-    <Layout>
+    <ExaminationLayout>
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Examination Setup</h1>
@@ -746,7 +746,7 @@ const ExaminationSetupPage = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </ExaminationLayout>
   );
 };
 

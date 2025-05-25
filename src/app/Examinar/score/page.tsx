@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
 import {
   Search, Save, AlertTriangle, CheckCircle,
   Eye, BarChart2, XCircle, HelpCircle, FileText
@@ -347,7 +347,7 @@ const ScoreEntryPage = () => {
   };
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <div className="flex flex-col h-full">
         {/* Header with language toggle */}
         <div className="flex justify-between items-center p-4 bg-white border-b">
@@ -626,7 +626,7 @@ const ScoreEntryPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </ExaminerLayout>
   );
 };
 

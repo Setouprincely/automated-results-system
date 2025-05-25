@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import Image from 'next/image';
 import { CheckCircle, AlertTriangle, Download, Printer, Share2 } from 'lucide-react';
 
@@ -35,7 +35,7 @@ const mockRegistrationData: RegistrationData = {
   status: 'confirmed',
   studentId: 'GCE2025-ST-003421',
   fullName: 'John Doe',
-  photoUrl: '/api/placeholder/120/150', // Placeholder for student photo
+  photoUrl: '/images/prince.jpg', // Student photo
   examLevel: 'Advanced Level (A Level)',
   examCenter: 'Buea Examination Center',
   centerCode: 'BEC-023',
@@ -59,14 +59,9 @@ const RegistrationConfirmation = () => {
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
   useEffect(() => {
-    // In a real app, you would fetch data from your API based on the student's ID
-    // For now, we'll use a timeout to simulate an API call
-    const timer = setTimeout(() => {
-      setRegistrationData(mockRegistrationData);
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    // Remove artificial delay for better performance
+    setRegistrationData(mockRegistrationData);
+    setIsLoading(false);
   }, []);
 
   const toggleLanguage = () => {
@@ -174,7 +169,7 @@ const RegistrationConfirmation = () => {
 
   if (isLoading) {
     return (
-      <Layout>
+      <StudentLayout>
         <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gray-50">
           <div className="w-full max-w-3xl px-4 py-8 mx-auto bg-white rounded-lg shadow-md">
             <div className="flex flex-col items-center justify-center space-y-4">
@@ -183,14 +178,14 @@ const RegistrationConfirmation = () => {
             </div>
           </div>
         </div>
-      </Layout>
+      </StudentLayout>
     );
   }
 
   // If we have data but it's not loading, render the confirmation page
   if (!isLoading && registrationData) {
     return (
-      <Layout>
+      <StudentLayout>
         <div className="min-h-screen py-12 bg-gray-50 print:bg-white">
           <div className="w-full max-w-4xl px-4 mx-auto">
             {/* Language Toggle */}
@@ -210,7 +205,7 @@ const RegistrationConfirmation = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Image
-                    src="/api/placeholder/60/60"
+                    src="/images/GCEB.png"
                     alt="GCE Board Logo"
                     width={60}
                     height={60}
@@ -404,13 +399,13 @@ const RegistrationConfirmation = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </StudentLayout>
   );
   }
 
   // Fallback for unexpected state
   return (
-    <Layout>
+    <StudentLayout>
       <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gray-50">
         <div className="w-full max-w-3xl px-4 py-8 mx-auto bg-white rounded-lg shadow-md">
           <div className="flex flex-col items-center justify-center space-y-4">
@@ -427,7 +422,7 @@ const RegistrationConfirmation = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </StudentLayout>
   );
 };
 

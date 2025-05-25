@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import {
   CheckCircle,
   AlertCircle,
@@ -95,12 +95,10 @@ export default function CertificateRequestPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setTrackingNumber('CRT' + Math.floor(100000 + Math.random() * 900000));
-      setIsSubmitted(true);
-      setLoading(false);
-    }, 2000);
+    // Remove artificial delay for better performance
+    setTrackingNumber('CRT' + Math.floor(100000 + Math.random() * 900000));
+    setIsSubmitted(true);
+    setLoading(false);
   };
 
   // Handle step navigation
@@ -129,7 +127,7 @@ export default function CertificateRequestPage() {
   };
 
   return (
-    <Layout>
+    <StudentLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Certificate Request</h1>
@@ -694,6 +692,6 @@ export default function CertificateRequestPage() {
           </div>
         )}
       </div>
-    </Layout>
+    </StudentLayout>
   );
 }

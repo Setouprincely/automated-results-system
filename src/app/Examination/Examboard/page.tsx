@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import ExaminationLayout from '@/components/layouts/ExaminationLayout';
 import { Card } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import {
@@ -77,29 +77,29 @@ export default function ExamBoardDashboard() {
   }, []);
 
   if (loading) return (
-    <Layout>
+    <ExaminationLayout>
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="text-center">
           <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold">Loading dashboard data...</h2>
         </div>
       </div>
-    </Layout>
+    </ExaminationLayout>
   );
 
   if (error) return (
-    <Layout>
+    <ExaminationLayout>
       <div className="bg-gray-100 min-h-screen p-4">
         <Alert variant="destructive" className="mt-4">
           <AlertTriangle className="h-4 w-4 mr-2" />
           <p>{error}</p>
         </Alert>
       </div>
-    </Layout>
+    </ExaminationLayout>
   );
 
   return (
-    <Layout>
+    <ExaminationLayout>
       <div className="p-6 bg-gray-100">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Examination Board Dashboard</h1>
@@ -312,6 +312,6 @@ export default function ExamBoardDashboard() {
           </Card>
         </div>
       </div>
-    </Layout>
+    </ExaminationLayout>
   );
 }

@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  Clock, 
-  ArrowRight, 
-  Filter, 
-  Search, 
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
+import {
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  ArrowRight,
+  Filter,
+  Search,
   Download,
   FileCheck,
   UserCheck,
@@ -133,32 +133,32 @@ const VerificationWorkflowPage = () => {
   // Filter tasks based on search query and status filter
   useEffect(() => {
     let result = tasks;
-    
+
     if (searchQuery) {
-      result = result.filter(task => 
+      result = result.filter(task =>
         task.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.center.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.assignedTo.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.id.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== 'all') {
       result = result.filter(task => task.status === statusFilter);
     }
-    
+
     setFilteredTasks(result);
   }, [searchQuery, statusFilter, tasks]);
 
   const getStatusIcon = (status: VerificationStatus) => {
     switch(status) {
-      case 'pending': 
+      case 'pending':
         return <Clock className="text-yellow-500" />;
-      case 'in_progress': 
+      case 'in_progress':
         return <ArrowRight className="text-blue-500" />;
-      case 'verified': 
+      case 'verified':
         return <CheckCircle className="text-green-500" />;
-      case 'rejected': 
+      case 'rejected':
         return <AlertCircle className="text-red-500" />;
     }
   };
@@ -184,7 +184,7 @@ const VerificationWorkflowPage = () => {
 
   const handleUpdateStatus = (newStatus: VerificationStatus) => {
     if (!selectedTask) return;
-    
+
     // In a real app, you would call an API to update the status
     const updatedTasks = tasks.map(task => {
       if (task.id === selectedTask.id) {
@@ -199,42 +199,42 @@ const VerificationWorkflowPage = () => {
       }
       return task;
     });
-    
+
     setTasks(updatedTasks);
     setFilteredTasks(updatedTasks);
   };
 
   const getStatusBadgeClass = (status: VerificationStatus) => {
     switch(status) {
-      case 'pending': 
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800';
-      case 'in_progress': 
+      case 'in_progress':
         return 'bg-blue-100 text-blue-800';
-      case 'verified': 
+      case 'verified':
         return 'bg-green-100 text-green-800';
-      case 'rejected': 
+      case 'rejected':
         return 'bg-red-100 text-red-800';
     }
   };
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <Head>
         <title>Verification Workflow | GCE Automated System</title>
       </Head>
-      
+
       <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Examination Verification Workflow</h1>
-          
+
           <div className="flex space-x-3">
-            <button 
+            <button
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <FileCheck className="h-5 w-5 mr-2" />
               Assign Verification Tasks
             </button>
-            <button 
+            <button
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <Download className="h-5 w-5 mr-2" />
@@ -242,7 +242,7 @@ const VerificationWorkflowPage = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="bg-white shadow-sm rounded-lg border border-gray-200">
           <div className="p-4 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
@@ -258,7 +258,7 @@ const VerificationWorkflowPage = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              
+
               <div className="relative inline-flex">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Filter className="h-5 w-5 text-gray-400" />
@@ -302,8 +302,8 @@ const VerificationWorkflowPage = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredTasks.map((task) => (
-                    <tr 
-                      key={task.id} 
+                    <tr
+                      key={task.id}
                       onClick={() => handleTaskSelection(task)}
                       className={`hover:bg-gray-50 cursor-pointer ${selectedTask?.id === task.id ? 'bg-blue-50' : ''}`}
                     >
@@ -320,11 +320,11 @@ const VerificationWorkflowPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div 
+                          <div
                             className={`h-2.5 rounded-full ${
                               task.status === 'verified' ? 'bg-green-500' :
                               task.status === 'rejected' ? 'bg-red-500' : 'bg-blue-500'
-                            }`} 
+                            }`}
                             style={{ width: `${task.progress}%` }}
                           ></div>
                         </div>
@@ -334,7 +334,7 @@ const VerificationWorkflowPage = () => {
                         {formatDate(task.lastUpdated)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
+                        <button
                           className="text-blue-600 hover:text-blue-900"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -363,14 +363,14 @@ const VerificationWorkflowPage = () => {
               <h2 className="text-lg font-medium text-gray-900">
                 Task Details - {selectedTask.id}
               </h2>
-              <button 
+              <button
                 onClick={handleResetSelection}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -394,7 +394,7 @@ const VerificationWorkflowPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Verification Status</h3>
                   <div className="mt-3 border rounded-md divide-y">
@@ -426,7 +426,7 @@ const VerificationWorkflowPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <h3 className="text-sm font-medium text-gray-500">Verification Progress</h3>
                 <div className="mt-2">
@@ -444,8 +444,8 @@ const VerificationWorkflowPage = () => {
                       </div>
                     </div>
                     <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
-                      <div 
-                        style={{ width: `${selectedTask.progress}%` }} 
+                      <div
+                        style={{ width: `${selectedTask.progress}%` }}
                         className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
                           selectedTask.status === 'verified' ? 'bg-green-500' :
                           selectedTask.status === 'rejected' ? 'bg-red-500' : 'bg-blue-500'
@@ -455,12 +455,12 @@ const VerificationWorkflowPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <h3 className="text-sm font-medium text-gray-500">Actions</h3>
                 <div className="mt-3 flex justify-between flex-wrap gap-3">
                   <div className="space-x-3">
-                    <button 
+                    <button
                       onClick={() => handleUpdateStatus('verified')}
                       disabled={selectedTask.status === 'verified'}
                       className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
@@ -472,7 +472,7 @@ const VerificationWorkflowPage = () => {
                       <Check className="h-4 w-4 mr-2" />
                       Mark as Verified
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleUpdateStatus('rejected')}
                       disabled={selectedTask.status === 'rejected'}
                       className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
@@ -485,9 +485,9 @@ const VerificationWorkflowPage = () => {
                       Mark as Rejected
                     </button>
                   </div>
-                  
+
                   <div>
-                    <button 
+                    <button
                       className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       <UserCheck className="h-4 w-4 mr-2" />
@@ -499,19 +499,19 @@ const VerificationWorkflowPage = () => {
             </div>
           </div>
         )}
-        
+
         <div className="flex items-center justify-between border-t border-gray-200 pt-4">
           <div className="text-sm text-gray-500">
             Showing {filteredTasks.length} of {tasks.length} verification tasks
           </div>
-          
+
           <div className="flex-1 flex justify-between sm:justify-end">
-            <button 
+            <button
               className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Previous
             </button>
-            <button 
+            <button
               className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Next
@@ -519,7 +519,7 @@ const VerificationWorkflowPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </ExaminerLayout>
   );
 };
 

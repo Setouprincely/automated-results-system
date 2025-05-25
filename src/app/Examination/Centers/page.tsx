@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/components/layouts/layout';
+import ExaminationLayout from '@/components/layouts/ExaminationLayout';
 import {
   Card,
   CardContent,
@@ -337,7 +337,7 @@ export default function ExaminationCentersPage() {
   };
 
   return (
-    <DashboardLayout>
+    <ExaminationLayout>
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Examination Centers Management</h1>
@@ -845,6 +845,6 @@ export default function ExaminationCentersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </ExaminationLayout>
   );
 }

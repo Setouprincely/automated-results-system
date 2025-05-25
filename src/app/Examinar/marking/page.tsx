@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
 import {
   Card,
   CardContent,
@@ -238,7 +238,7 @@ export default function MarkingInterface() {
   };
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <div className="p-6 max-w-full bg-gray-50 min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">GCE Examination Marking Interface</h1>
@@ -560,6 +560,6 @@ export default function MarkingInterface() {
           </div>
         )}
       </div>
-    </Layout>
+    </ExaminerLayout>
   );
 }

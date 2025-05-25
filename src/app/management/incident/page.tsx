@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import {
   AlertCircle,
   Calendar,
@@ -145,7 +145,7 @@ const ExaminationIncidentReportingPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -431,7 +431,7 @@ const ExaminationIncidentReportingPage = () => {
           </div>
         </div>
       )}
-    </DashboardLayout>
+    </AdminLayout>
   );
 };
 

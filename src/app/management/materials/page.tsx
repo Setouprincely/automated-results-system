@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -353,7 +353,7 @@ export default function MaterialsManagementPage() {
   // Access log columns are now defined directly in the table
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Examination Materials Management</h1>
@@ -801,6 +801,6 @@ export default function MaterialsManagementPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

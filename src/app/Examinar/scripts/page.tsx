@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/layouts/layout';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -67,14 +67,14 @@ export default function ScriptsAssignment() {
   const [selectedScript, setSelectedScript] = useState<Script | null>(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   useEffect(() => {
     // Mock data - would be fetched from API in production
     const fetchScripts = async () => {
       try {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         const mockScripts: Script[] = [
           {
             id: 'SCR-001',
@@ -143,7 +143,7 @@ export default function ScriptsAssignment() {
             priority: 'high'
           }
         ];
-        
+
         setScripts(mockScripts);
         setLoading(false);
       } catch (error) {
@@ -151,13 +151,13 @@ export default function ScriptsAssignment() {
         setLoading(false);
       }
     };
-    
+
     fetchScripts();
   }, []);
 
   const handleAcceptScript = (script: Script) => {
     // In production, this would call an API to update the status
-    const updatedScripts = scripts.map(s => 
+    const updatedScripts = scripts.map(s =>
       s.id === script.id ? {...s, status: 'in_progress' as const} : s
     );
     setScripts(updatedScripts);
@@ -212,7 +212,7 @@ export default function ScriptsAssignment() {
     if (filter !== 'all' && script.status !== filter) {
       return false;
     }
-    
+
     // Apply search filter (across multiple fields)
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -224,12 +224,12 @@ export default function ScriptsAssignment() {
         script.candidateId.toLowerCase().includes(searchLower)
       );
     }
-    
+
     return true;
   });
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <div className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Scripts Assignment</h1>
@@ -255,7 +255,7 @@ export default function ScriptsAssignment() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-indigo-50">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
@@ -267,7 +267,7 @@ export default function ScriptsAssignment() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-green-50">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
@@ -358,8 +358,8 @@ export default function ScriptsAssignment() {
                             <TableCell>
                               <div className="flex gap-2">
                                 {script.status === 'pending' && (
-                                  <Button 
-                                    variant="default" 
+                                  <Button
+                                    variant="default"
                                     size="sm"
                                     onClick={() => handleAcceptScript(script)}
                                     className="flex items-center"
@@ -367,10 +367,10 @@ export default function ScriptsAssignment() {
                                     <CheckCircle className="h-4 w-4 mr-1" /> Accept
                                   </Button>
                                 )}
-                                
+
                                 {script.status === 'in_progress' && (
-                                  <Button 
-                                    variant="default" 
+                                  <Button
+                                    variant="default"
                                     size="sm"
                                     onClick={() => handleStartMarking(script)}
                                     className="flex items-center"
@@ -378,9 +378,9 @@ export default function ScriptsAssignment() {
                                     <ArrowRight className="h-4 w-4 mr-1" /> Continue
                                   </Button>
                                 )}
-                                
-                                <Button 
-                                  variant="outline" 
+
+                                <Button
+                                  variant="outline"
                                   size="sm"
                                   onClick={() => handleViewScript(script)}
                                   className="flex items-center"
@@ -410,7 +410,7 @@ export default function ScriptsAssignment() {
               Detailed information about the selected script
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedScript && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -438,7 +438,7 @@ export default function ScriptsAssignment() {
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-medium mb-3">Status Information</h3>
                 <div className="space-y-2">
@@ -460,7 +460,7 @@ export default function ScriptsAssignment() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="col-span-1 md:col-span-2 bg-blue-50 p-4 rounded-md">
                 <h3 className="text-lg font-medium mb-2">Marking Guidelines</h3>
                 <ul className="list-disc pl-5 space-y-1">
@@ -472,14 +472,14 @@ export default function ScriptsAssignment() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter className="flex justify-between">
             <Button variant="outline" onClick={() => setShowModal(false)}>
               Close
             </Button>
-            
+
             {selectedScript?.status === 'pending' && (
-              <Button 
+              <Button
                 onClick={() => {
                   handleAcceptScript(selectedScript);
                   setShowModal(false);
@@ -488,7 +488,7 @@ export default function ScriptsAssignment() {
                 Accept Script
               </Button>
             )}
-            
+
             {selectedScript?.status === 'in_progress' && (
               <Button
                 onClick={() => {
@@ -502,6 +502,6 @@ export default function ScriptsAssignment() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </ExaminerLayout>
   );
 }

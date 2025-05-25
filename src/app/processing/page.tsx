@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, BarChart2 } from 'lucide-react';
@@ -11,7 +11,7 @@ export default function ProcessingPage() {
   const router = useRouter();
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-6">Examination Processing</h1>
         <p className="text-gray-600 mb-8">
@@ -58,6 +58,6 @@ export default function ProcessingPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

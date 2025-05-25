@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
-import { 
-  LineChart, Line, BarChart, Bar, PieChart, Pie, 
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+import SchoolsLayout from '@/components/layouts/SchoolsLayout';
+import {
+  LineChart, Line, BarChart, Bar, PieChart, Pie,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, Cell
 } from 'recharts';
-import { 
-  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle 
+import {
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -60,12 +60,12 @@ const SchoolAnalyticsPage = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 800);
-    
+
     return () => clearTimeout(timer);
   }, [examType, academicYear]);
 
   return (
-    <Layout>
+    <SchoolsLayout>
       <div className="p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
@@ -74,7 +74,7 @@ const SchoolAnalyticsPage = () => {
               Comprehensive analytics and insights into student performance
             </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
             <div className="flex items-center space-x-2">
               <Select value={academicYear} onValueChange={setAcademicYear}>
@@ -91,7 +91,7 @@ const SchoolAnalyticsPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Select value={examType} onValueChange={setExamType}>
                 <SelectTrigger className="w-40">
@@ -105,7 +105,7 @@ const SchoolAnalyticsPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <Button className="flex items-center" variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Export Report
@@ -136,7 +136,7 @@ const SchoolAnalyticsPage = () => {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Pass Rate</CardTitle>
@@ -149,7 +149,7 @@ const SchoolAnalyticsPage = () => {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Students Tested</CardTitle>
@@ -161,7 +161,7 @@ const SchoolAnalyticsPage = () => {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Excellence Rate (A/A*)</CardTitle>
@@ -356,7 +356,7 @@ const SchoolAnalyticsPage = () => {
                           <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '76.3%' }}></div>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Regional Average</span>
@@ -366,7 +366,7 @@ const SchoolAnalyticsPage = () => {
                           <div className="bg-gray-500 h-2.5 rounded-full" style={{ width: '71.8%' }}></div>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>National Average</span>
@@ -376,7 +376,7 @@ const SchoolAnalyticsPage = () => {
                           <div className="bg-gray-500 h-2.5 rounded-full" style={{ width: '68.5%' }}></div>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Top Performing School</span>
@@ -387,7 +387,7 @@ const SchoolAnalyticsPage = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="mt-8">
                       <h4 className="font-semibold mb-4">Performance Ranking</h4>
                       <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 text-center">
@@ -403,7 +403,7 @@ const SchoolAnalyticsPage = () => {
           </>
         )}
       </div>
-    </Layout>
+    </SchoolsLayout>
   );
 };
 

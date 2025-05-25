@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import StudentLayout from '@/components/layouts/StudentLayout';
 import {
   Card,
   CardContent,
@@ -24,7 +24,7 @@ const studentInfo = {
   center: "Government High School Limbe",
   examSession: "June 2025",
   level: "Advanced Level",
-  photo: "/api/placeholder/120/120" // In production this would be stored securely
+  photo: "/images/prince.jpg" // In production this would be stored securely
 };
 
 const resultsData = {
@@ -61,13 +61,9 @@ export default function StudentResults() {
   const [resultsVerified] = useState(true); // Removed unused setter
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
-  // Simulate loading data
+  // Remove artificial delay for better performance
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, []);
 
   // Toggle language function
@@ -164,19 +160,19 @@ export default function StudentResults() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <StudentLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-lg font-medium">{t.loading}</p>
           </div>
         </div>
-      </DashboardLayout>
+      </StudentLayout>
     );
   }
 
   return (
-    <DashboardLayout>
+    <StudentLayout>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{t.pageTitle}</h1>
@@ -415,6 +411,6 @@ export default function StudentResults() {
           </Card>
         )}
       </div>
-    </DashboardLayout>
+    </StudentLayout>
   );
 }

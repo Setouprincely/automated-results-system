@@ -1,10 +1,10 @@
 // pages/admin/system-configuration.js
 "use client";
 import { useState } from 'react';
-import { 
-  Save, 
-  Settings, 
-  Globe, 
+import {
+  Save,
+  Settings,
+  Globe,
   Shield,
   Database,
   Mail,
@@ -12,11 +12,11 @@ import {
   Bell
 } from 'lucide-react';
 import Head from 'next/head';
-import Layout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 
 export default function SystemConfiguration() {
   const [activeTab, setActiveTab] = useState('general');
-  
+
   const tabs = [
     { id: 'general', label: 'General', icon: <Settings size={18} /> },
     { id: 'localization', label: 'Localization', icon: <Globe size={18} /> },
@@ -26,9 +26,9 @@ export default function SystemConfiguration() {
     { id: 'sms', label: 'SMS Gateway', icon: <MessageSquare size={18} /> },
     { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
   ];
-  
+
   return (
-    <Layout>
+    <AdminLayout>
       <Head>
         <title>System Configuration | GCE Admin</title>
       </Head>
@@ -40,7 +40,7 @@ export default function SystemConfiguration() {
             <span>Save Changes</span>
           </button>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
             <div className="flex overflow-x-auto">
@@ -60,7 +60,7 @@ export default function SystemConfiguration() {
               ))}
             </div>
           </div>
-          
+
           <div className="p-6">
             {activeTab === 'general' && <GeneralSettings />}
             {activeTab === 'localization' && <LocalizationSettings />}
@@ -72,7 +72,7 @@ export default function SystemConfiguration() {
           </div>
         </div>
       </div>
-    </Layout>
+    </AdminLayout>
   );
 }
 
@@ -80,7 +80,7 @@ function GeneralSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">General Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -92,7 +92,7 @@ function GeneralSettings() {
             defaultValue="GCE Results Examination System"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Administrator Email
@@ -103,7 +103,7 @@ function GeneralSettings() {
             defaultValue="admin@gce.cm"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             System Timezone
@@ -114,7 +114,7 @@ function GeneralSettings() {
             <option value="Africa/Lagos">Africa/Lagos (UTC+01:00)</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Maintenance Mode
@@ -131,7 +131,7 @@ function GeneralSettings() {
           </div>
         </div>
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Maintenance Message
@@ -150,7 +150,7 @@ function LocalizationSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">Localization Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -161,7 +161,7 @@ function LocalizationSettings() {
             <option value="fr">French</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Date Format
@@ -173,7 +173,7 @@ function LocalizationSettings() {
           </select>
         </div>
       </div>
-      
+
       <div>
         <label className="block mb-2 text-sm font-medium text-gray-700">Available Languages</label>
         <div className="space-y-2">
@@ -195,7 +195,7 @@ function SecuritySettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">Security Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -207,7 +207,7 @@ function SecuritySettings() {
             <option value="custom">Custom</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Session Timeout (minutes)
@@ -220,7 +220,7 @@ function SecuritySettings() {
             max="120"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Failed Login Attempts (before lockout)
@@ -233,7 +233,7 @@ function SecuritySettings() {
             max="10"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Account Lockout Duration (minutes)
@@ -247,7 +247,7 @@ function SecuritySettings() {
           />
         </div>
       </div>
-      
+
       <div>
         <label className="block mb-2 text-sm font-medium text-gray-700">Two-Factor Authentication</label>
         <div className="space-y-2">
@@ -273,7 +273,7 @@ function DatabaseSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">Database Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -284,7 +284,7 @@ function DatabaseSettings() {
             <option value="mongodb">MongoDB</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Host
@@ -295,7 +295,7 @@ function DatabaseSettings() {
             defaultValue="localhost"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Port
@@ -306,7 +306,7 @@ function DatabaseSettings() {
             defaultValue="5432"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Database Name
@@ -317,7 +317,7 @@ function DatabaseSettings() {
             defaultValue="gce_results"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Username
@@ -328,7 +328,7 @@ function DatabaseSettings() {
             defaultValue="gce_admin"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Password
@@ -340,7 +340,7 @@ function DatabaseSettings() {
           />
         </div>
       </div>
-      
+
       <div>
         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
           Test Connection
@@ -354,7 +354,7 @@ function EmailSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">Email Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -366,7 +366,7 @@ function EmailSettings() {
             defaultValue="smtp.example.com"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             SMTP Port
@@ -377,7 +377,7 @@ function EmailSettings() {
             defaultValue="587"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Encryption
@@ -388,7 +388,7 @@ function EmailSettings() {
             <option value="none">None</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             From Email
@@ -399,7 +399,7 @@ function EmailSettings() {
             defaultValue="noreply@gce.cm"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Username
@@ -410,7 +410,7 @@ function EmailSettings() {
             defaultValue="gce_mailer"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Password
@@ -422,7 +422,7 @@ function EmailSettings() {
           />
         </div>
       </div>
-      
+
       <div>
         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
           Send Test Email
@@ -436,7 +436,7 @@ function SMSSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">SMS Gateway Settings</h2>
-      
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -449,7 +449,7 @@ function SMSSettings() {
             <option value="custom">Custom</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             API Key
@@ -460,7 +460,7 @@ function SMSSettings() {
             defaultValue="sk_****************************************"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             API Secret
@@ -471,7 +471,7 @@ function SMSSettings() {
             defaultValue="****************************************"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             From Number/ID
@@ -483,7 +483,7 @@ function SMSSettings() {
           />
         </div>
       </div>
-      
+
       <div>
         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
           Send Test SMS
@@ -497,7 +497,7 @@ function NotificationSettings() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-medium text-gray-900">Notification Settings</h2>
-      
+
       <div className="space-y-4">
         <h3 className="text-md font-medium text-gray-800">Email Notifications</h3>
         <div className="space-y-2">
@@ -511,7 +511,7 @@ function NotificationSettings() {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
+
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
             <div>
               <p className="font-medium">Results Publication</p>
@@ -522,7 +522,7 @@ function NotificationSettings() {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
+
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
             <div>
               <p className="font-medium">System Alerts</p>
@@ -534,7 +534,7 @@ function NotificationSettings() {
             </label>
           </div>
         </div>
-        
+
         <h3 className="text-md font-medium text-gray-800 mt-6">SMS Notifications</h3>
         <div className="space-y-2">
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
@@ -547,7 +547,7 @@ function NotificationSettings() {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
+
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
             <div>
               <p className="font-medium">Registration Confirmation</p>

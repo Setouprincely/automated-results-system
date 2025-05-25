@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Layout from '@/components/layouts/layout';
+import ExaminationLayout from '@/components/layouts/ExaminationLayout';
 import {
   Tabs,
   TabsContent,
@@ -278,7 +278,7 @@ const GradingConfigurationPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <ExaminationLayout>
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -769,7 +769,7 @@ const GradingConfigurationPage: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </ExaminationLayout>
   );
 };
 

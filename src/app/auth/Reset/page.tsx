@@ -63,11 +63,23 @@ export default function ResetPassword() {
       <div className="min-h-screen flex flex-col justify-center items-center px-4 bg-gray-50">
         <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
           <div className="flex items-center justify-between mb-6">
-            <Link href="/login" className="text-sm text-blue-500 flex items-center">
+            <Link href="/auth/Login" className="text-sm text-blue-500 flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Login
             </Link>
           </div>
+
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-200 p-2">
+              <img
+                src="/images/GCEB.png"
+                alt="GCE Board Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Reset Password</h2>
           <form onSubmit={handleResetPassword}>
             <div className="mb-4 relative">

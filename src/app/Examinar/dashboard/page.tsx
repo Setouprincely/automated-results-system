@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/layouts/layout';
+import ExaminerLayout from '@/components/layouts/ExaminerLayout';
 import {
   Card,
   CardContent,
@@ -127,7 +127,7 @@ export default function ExaminerDashboard() {
   const completionPercentage = Math.round((examinerStats.completedScripts / examinerStats.assignedScripts) * 100);
 
   return (
-    <Layout>
+    <ExaminerLayout>
       <div className="container mx-auto p-6">
         {/* Welcome header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -314,6 +314,6 @@ export default function ExaminerDashboard() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </ExaminerLayout>
   );
 }

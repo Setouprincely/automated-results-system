@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import { format } from 'date-fns';
 
 // UI Components
@@ -410,7 +410,7 @@ export default function AttendanceTrackingPage() {
   }), [students]); // Only recalculate when students array changes
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="container mx-auto py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
@@ -972,6 +972,6 @@ export default function AttendanceTrackingPage() {
           </Card>
         )}
       </div>
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import {
   Table,
   TableBody,
@@ -244,7 +244,7 @@ export default function InvigilatorAssignmentPage() {
   };
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -801,6 +801,6 @@ export default function InvigilatorAssignmentPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

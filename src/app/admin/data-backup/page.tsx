@@ -5,7 +5,7 @@ import {
   Save, Database, DownloadCloud, UploadCloud,
   RefreshCw, CheckCircle, AlertCircle, Calendar
 } from 'lucide-react';
-import Layout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 
 // Define interfaces for type safety
 interface Backup {
@@ -98,7 +98,7 @@ export default function DataBackupRestore() {
   };
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="px-6 py-8 bg-gray-100 min-h-screen">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Data Backup & Restore</h1>
@@ -296,6 +296,6 @@ export default function DataBackupRestore() {
           </div>
         </div>
       </div>
-    </Layout>
+    </AdminLayout>
   );
 }

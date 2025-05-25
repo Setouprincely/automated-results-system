@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import SchoolsLayout from '@/components/layouts/SchoolsLayout';
 import {
   Card,
   CardContent,
@@ -192,7 +192,7 @@ const FeeManagementPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <SchoolsLayout>
       <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Fee Management</h1>
@@ -376,7 +376,7 @@ const FeeManagementPage = () => {
           </CardFooter>
         </Card>
       </div>
-    </DashboardLayout>
+    </SchoolsLayout>
   );
 };
 

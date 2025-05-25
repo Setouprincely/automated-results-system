@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import DashboardLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import {
   Card,
   CardContent,
@@ -240,7 +240,7 @@ Overall Grade: ${result.overallGrade}
   };
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">{t.title}</h1>
         <Button variant="outline" onClick={toggleLanguage}>
@@ -764,7 +764,7 @@ Overall Grade: ${result.overallGrade}
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </AdminLayout>
   );
 }
 

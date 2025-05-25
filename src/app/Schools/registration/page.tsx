@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Layout from '@/components/layouts/layout';
+import SchoolsLayout from '@/components/layouts/SchoolsLayout';
 import {
   AlertCircle,
   CheckCircle,
@@ -359,7 +359,7 @@ export default function CandidateRegistration() {
   };
 
   return (
-    <Layout>
+    <SchoolsLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Candidate Registration</h1>
@@ -1024,6 +1024,6 @@ export default function CandidateRegistration() {
           </div>
         )}
       </div>
-    </Layout>
+    </SchoolsLayout>
   );
 }

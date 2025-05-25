@@ -1,18 +1,18 @@
 // pages/admin/dashboard.js
 "use client";
 import { useState, useEffect } from 'react';
-import AdminLayout from '@/components/layouts/DashboardLayout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 import Head from 'next/head';
 import Link from 'next/link';
-import { 
-  BarChart, 
-  PieChart, 
-  UsersIcon, 
-  Settings, 
-  Database, 
-  Activity, 
-  FileText, 
-  AlertTriangle, 
+import {
+  BarChart,
+  PieChart,
+  UsersIcon,
+  Settings,
+  Database,
+  Activity,
+  FileText,
+  AlertTriangle,
   Server,
   Globe,
   ChevronRight
@@ -58,15 +58,15 @@ export default function AdminDashboard() {
         // const statsResponse = await fetch('/api/admin/statistics');
         // const stats = await statsResponse.json();
         // setStatistics(stats);
-        
+
         // const alertsResponse = await fetch('/api/admin/alerts');
         // const alertsData = await alertsResponse.json();
         // setAlerts(alertsData);
-        
+
         // const activityResponse = await fetch('/api/admin/activity');
         // const activityData = await activityResponse.json();
         // setRecentActivity(activityData);
-        
+
         // Using mock data for now
         setTimeout(() => {
           setStatistics(mockStatistics);
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
 
     fetchDashboardData();
   }, []);
-  
+
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'fr' : 'en');
   };
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
       loading: 'Chargement des données...'
     }
   };
-  
+
   const t = translations[language];
 
   if (loading) {
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       <Head>
         <title>GCE System - {t.title}</title>
       </Head>
-      
+
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center mb-6">
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
               {language === 'en' ? 'Français' : 'English'}
             </button>
           </div>
-          
+
           {/* Dashboard Grid */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Key Statistics */}
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-blue-900">{statistics.totalUsers}</p>
                   </div>
-                  
+
                   <div className="bg-green-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <FileText className="h-5 w-5 text-green-500 mr-2" />
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-green-900">{statistics.activeExaminations}</p>
                   </div>
-                  
+
                   <div className="bg-yellow-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-yellow-900">{statistics.pendingResults}</p>
                   </div>
-                  
+
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <Activity className="h-5 w-5 text-indigo-500 mr-2" />
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-indigo-900">{statistics.systemStatus}</p>
                   </div>
-                  
+
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <Server className="h-5 w-5 text-purple-500 mr-2" />
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-purple-900">{statistics.serverUptime}</p>
                   </div>
-                  
+
                   <div className="bg-pink-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <UsersIcon className="h-5 w-5 text-pink-500 mr-2" />
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-2xl font-bold text-pink-900">{statistics.todayLogins}</p>
                   </div>
-                  
+
                   <div className="bg-red-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <Database className="h-5 w-5 text-red-500 mr-2" />
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-            
+
             {/* System Alerts */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <div className="p-4 border-b border-gray-200">
@@ -248,9 +248,9 @@ export default function AdminDashboard() {
                     <li key={alert.id} className="p-4 hover:bg-gray-50">
                       <div className="flex items-start">
                         <div className={`mt-0.5 flex-shrink-0 h-2 w-2 rounded-full ${
-                          alert.level === 'error' ? 'bg-red-500' : 
-                          alert.level === 'warning' ? 'bg-yellow-500' : 
-                          alert.level === 'success' ? 'bg-green-500' : 
+                          alert.level === 'error' ? 'bg-red-500' :
+                          alert.level === 'warning' ? 'bg-yellow-500' :
+                          alert.level === 'success' ? 'bg-green-500' :
                           'bg-blue-500'
                         }`}></div>
                         <div className="ml-3 flex-1">
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                 </Link>
               </div>
             </div>
-            
+
             {/* Recent Activity */}
             <div className="col-span-2 bg-white rounded-lg shadow overflow-hidden">
               <div className="p-4 border-b border-gray-200">
@@ -304,7 +304,7 @@ export default function AdminDashboard() {
                 </Link>
               </div>
             </div>
-            
+
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <div className="p-4 border-b border-gray-200">
@@ -316,22 +316,22 @@ export default function AdminDashboard() {
                     <UsersIcon className="h-5 w-5 text-blue-600 mr-3" />
                     <span className="text-sm font-medium text-gray-900">{t.manageUsers}</span>
                   </Link>
-                  
+
                   <Link href="/admin/configuration" className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                     <Settings className="h-5 w-5 text-blue-600 mr-3" />
                     <span className="text-sm font-medium text-gray-900">{t.configureSystem}</span>
                   </Link>
-                  
+
                   <Link href="/admin/backup" className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                     <Database className="h-5 w-5 text-blue-600 mr-3" />
                     <span className="text-sm font-medium text-gray-900">{t.backupData}</span>
                   </Link>
-                  
+
                   <Link href="/admin/logs" className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                     <FileText className="h-5 w-5 text-blue-600 mr-3" />
                     <span className="text-sm font-medium text-gray-900">{t.viewLogs}</span>
                   </Link>
-                  
+
                   <Link href="/admin/monitoring" className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                     <Activity className="h-5 w-5 text-blue-600 mr-3" />
                     <span className="text-sm font-medium text-gray-900">{t.monitorSystem}</span>

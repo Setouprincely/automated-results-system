@@ -1,11 +1,11 @@
 "use client";
 // pages/admin/monitoring.js
 import { useState, useEffect } from 'react';
-import { 
-  Activity, Server, Database, Users, Clock, 
+import {
+  Activity, Server, Database, Users, Clock,
   AlertTriangle, CheckCircle, ArrowUpCircle
 } from 'lucide-react';
-import AdminLayout from '@/components/layouts/layout';
+import AdminLayout from '@/components/layouts/AdminLayout';
 
 // Sample data - would be fetched from API in production
 const initialMetrics = {
@@ -39,7 +39,7 @@ export default function MonitoringDashboard() {
     const interval = setInterval(() => {
       // In real implementation, fetch actual data from backend
       const randomVariation = () => Math.floor(Math.random() * 5) - 2;
-      
+
       setMetrics(prev => ({
         ...prev,
         serverLoad: Math.max(0, Math.min(100, prev.serverLoad + randomVariation())),
@@ -48,10 +48,10 @@ export default function MonitoringDashboard() {
         activeSessions: Math.max(0, prev.activeSessions + Math.floor(Math.random() * 10) - 4),
         responseTime: `${Math.max(100, Math.min(500, parseInt(prev.responseTime) + randomVariation() * 10))}ms`
       }));
-      
+
       setLastRefreshed(new Date());
     }, refreshInterval * 1000);
-    
+
     return () => clearInterval(interval);
   }, [refreshInterval]);
 
@@ -62,13 +62,13 @@ export default function MonitoringDashboard() {
   };
 
   return (
-    <AdminLayout title="System Monitoring Dashboard">
+    <AdminLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">System Monitoring Dashboard</h1>
         <div className="flex items-center mt-2 space-x-2 text-sm text-gray-500">
           <Clock size={16} />
           <span>Last updated: {lastRefreshed.toLocaleTimeString()}</span>
-          <button 
+          <button
             onClick={handleRefresh}
             className="ml-4 flex items-center text-blue-600 hover:text-blue-800"
           >
@@ -77,7 +77,7 @@ export default function MonitoringDashboard() {
           </button>
           <div className="ml-6 flex items-center">
             <span className="mr-2">Auto-refresh:</span>
-            <select 
+            <select
               value={refreshInterval}
               onChange={(e) => setRefreshInterval(Number(e.target.value))}
               className="border rounded px-2 py-1 text-sm"
@@ -90,35 +90,35 @@ export default function MonitoringDashboard() {
           </div>
         </div>
       </div>
-      
+
       {/* System Status Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatusCard 
-          title="System Status" 
-          value={metrics.systemStatus === 'healthy' ? 'Operational' : 'Issues Detected'} 
+        <StatusCard
+          title="System Status"
+          value={metrics.systemStatus === 'healthy' ? 'Operational' : 'Issues Detected'}
           icon={<Server className="h-6 w-6 text-green-500" />}
           status={metrics.systemStatus === 'healthy' ? 'success' : 'warning'}
         />
-        <StatusCard 
-          title="Uptime" 
+        <StatusCard
+          title="Uptime"
           value={metrics.uptime}
           icon={<Activity className="h-6 w-6 text-blue-500" />}
           status="success"
         />
-        <StatusCard 
-          title="Response Time" 
+        <StatusCard
+          title="Response Time"
           value={metrics.responseTime}
           icon={<Clock className="h-6 w-6 text-purple-500" />}
           status={parseInt(metrics.responseTime) < 300 ? 'success' : 'warning'}
         />
-        <StatusCard 
-          title="Active Users" 
+        <StatusCard
+          title="Active Users"
           value={metrics.activeUsers.toLocaleString()}
           icon={<Users className="h-6 w-6 text-indigo-500" />}
           status="success"
         />
       </div>
-      
+
       {/* Main Metrics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Server Performance */}
@@ -128,31 +128,31 @@ export default function MonitoringDashboard() {
           </div>
           <div className="p-6">
             <div className="space-y-6">
-              <MetricBar 
-                label="CPU Load" 
-                value={metrics.serverLoad} 
+              <MetricBar
+                label="CPU Load"
+                value={metrics.serverLoad}
                 maxValue={100}
-                unit="%" 
+                unit="%"
                 threshold={80}
               />
-              <MetricBar 
-                label="Memory Usage" 
-                value={metrics.memoryUsage} 
+              <MetricBar
+                label="Memory Usage"
+                value={metrics.memoryUsage}
                 maxValue={100}
-                unit="%" 
+                unit="%"
                 threshold={85}
               />
-              <MetricBar 
-                label="Storage Usage" 
-                value={metrics.storageUsage} 
+              <MetricBar
+                label="Storage Usage"
+                value={metrics.storageUsage}
                 maxValue={100}
-                unit="%" 
+                unit="%"
                 threshold={90}
               />
             </div>
           </div>
         </div>
-        
+
         {/* User Activity */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-200">
@@ -185,7 +185,7 @@ export default function MonitoringDashboard() {
           </div>
         </div>
       </div>
-      
+
       {/* Recent Incidents */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
@@ -231,14 +231,14 @@ function StatusCard({ title, value, icon, status }) {
     error: 'bg-red-50 border-red-200',
     info: 'bg-blue-50 border-blue-200',
   };
-  
+
   const valueColors = {
     success: 'text-green-700',
     warning: 'text-yellow-700',
     error: 'text-red-700',
     info: 'text-blue-700',
   };
-  
+
   return (
     <div className={`rounded-lg border shadow-sm p-6 ${statusColors[status]}`}>
       <div className="flex items-center justify-between">
@@ -257,13 +257,13 @@ function StatusCard({ title, value, icon, status }) {
 // Component for metric bars
 function MetricBar({ label, value, maxValue, unit, threshold }) {
   const percentage = (value / maxValue) * 100;
-  
+
   // Determine color based on threshold
   let barColor = 'bg-green-500';
   if (percentage > threshold) {
     barColor = percentage > 95 ? 'bg-red-500' : 'bg-yellow-500';
   }
-  
+
   return (
     <div>
       <div className="flex justify-between mb-1">
@@ -271,7 +271,7 @@ function MetricBar({ label, value, maxValue, unit, threshold }) {
         <span className="text-sm font-medium text-gray-700">{value}{unit}</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div 
+        <div
           className={`h-2.5 rounded-full ${barColor}`}
           style={{ width: `${percentage}%` }}
         ></div>
@@ -290,7 +290,7 @@ function StatusIndicator({ type, resolved }) {
       </span>
     );
   }
-  
+
   switch (type) {
     case 'error':
       return (

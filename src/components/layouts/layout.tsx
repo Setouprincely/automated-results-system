@@ -2,11 +2,11 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Menu, 
-  ChevronDown, 
-  Search, 
-  Bell, 
+import {
+  Menu,
+  ChevronDown,
+  Search,
+  Bell,
   Settings,
   User,
   LogOut,
@@ -67,7 +67,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     status: 'operational',
     message: 'All systems operational'
   });
-  
+
   // Mock notifications data
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -108,10 +108,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home, current: pathname === '/admin/dashboard' },
     { name: 'Users', href: '/admin/users', icon: Users, current: pathname === '/admin/users' },
-    { 
-      name: 'Examinations', 
-      href: '#', 
-      icon: FileText, 
+    {
+      name: 'Examinations',
+      href: '#',
+      icon: FileText,
       current: pathname.includes('/admin/examinations'),
       children: [
         { name: 'Active Exams', href: '/admin/examinations/active', current: pathname === '/admin/examinations/active' },
@@ -131,9 +131,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const generateBreadcrumbs = () => {
     const paths = pathname.split('/').filter(p => p);
     const breadcrumbs = [];
-    
+
     let currentPath = '';
-    
+
     for (let i = 0; i < paths.length; i++) {
       currentPath += `/${paths[i]}`;
       breadcrumbs.push({
@@ -142,7 +142,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         current: i === paths.length - 1
       });
     }
-    
+
     return breadcrumbs;
   };
 
@@ -153,7 +153,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const newDarkModeState = !isDarkMode;
     setIsDarkMode(newDarkModeState);
     localStorage.setItem('darkMode', JSON.stringify(newDarkModeState));
-    
+
     if (newDarkModeState) {
       document.documentElement.classList.add('dark');
     } else {
@@ -179,10 +179,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   // Mark notification as read
   const markNotificationAsRead = (id: number) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, read: true } 
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id
+          ? { ...notification, read: true }
           : notification
       )
     );
@@ -191,7 +191,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   // Mark all notifications as read
   const markAllNotificationsAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(notification => ({ ...notification, read: true }))
     );
     setUnreadNotificationsCount(0);
@@ -223,7 +223,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (savedDarkMode !== null) {
       const darkModeState = JSON.parse(savedDarkMode);
       setIsDarkMode(darkModeState);
-      
+
       if (darkModeState) {
         document.documentElement.classList.add('dark');
       } else {
@@ -233,12 +233,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       // Check system preference
       const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDarkMode);
-      
+
       if (prefersDarkMode) {
         document.documentElement.classList.add('dark');
       }
     }
-    
+
     updateUnreadCount();
     fetchSystemStatus();
   }, []);
@@ -291,7 +291,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/admin/dashboard" className="flex items-center">
                 <img
                   className="h-8 w-auto"
-                  src="/logo-light.png"
+                  src="/images/GCEB.png"
                   alt="GCE System"
                 />
                 <span className="ml-2 text-white font-medium text-lg">GCE Admin</span>
@@ -327,9 +327,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       }`}
                       onClick={() => {
                         // Toggle submenu
-                        const updatedNav = navigation.map(navItem => 
-                          navItem.name === item.name 
-                            ? { ...navItem, isOpen: !navItem.isOpen } 
+                        const updatedNav = navigation.map(navItem =>
+                          navItem.name === item.name
+                            ? { ...navItem, isOpen: !navItem.isOpen }
                             : navItem
                         );
                         // setNavigation(updatedNav);
@@ -344,7 +344,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       <span className="flex-1">{item.name}</span>
                       <ChevronDown className="h-4 w-4" />
                     </button>
-                    
+
                     {/* Submenu */}
                     <div className="pl-10 space-y-1 mt-1">
                       {item.children?.map((child) => (
@@ -404,7 +404,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </button>
             </div>
             <div className="flex-shrink-0 flex items-center px-4">
-              <img className="h-8 w-auto" src="/logo-dark.png" alt="GCE System" />
+              <img className="h-8 w-auto" src="/images/GCEB.png" alt="GCE System" />
               <span className="ml-2 text-gray-900 dark:text-white font-medium text-lg">GCE Admin</span>
             </div>
             <div className="mt-5 flex-1 h-0 overflow-y-auto">
@@ -438,9 +438,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       }`}
                       onClick={() => {
                         // Toggle submenu
-                        const updatedNav = navigation.map(navItem => 
-                          navItem.name === item.name 
-                            ? { ...navItem, isOpen: !navItem.isOpen } 
+                        const updatedNav = navigation.map(navItem =>
+                          navItem.name === item.name
+                            ? { ...navItem, isOpen: !navItem.isOpen }
                             : navItem
                         );
                         // setNavigation(updatedNav);
@@ -455,7 +455,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       <span className="flex-1">{item.name}</span>
                       <ChevronDown className="h-5 w-5" />
                     </button>
-                    
+
                     {/* Submenu */}
                     <div className="pl-12 space-y-1 mt-1">
                       {item.children?.map((child) => (
@@ -511,7 +511,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="h-6 w-6" aria-hidden="true" />
           </button>
-          
+
           {/* Breadcrumbs */}
           <div className="hidden md:flex items-center px-4 border-r border-gray-200 dark:border-gray-700">
             <nav className="flex" aria-label="Breadcrumb">
@@ -531,8 +531,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       <Link
                         href={item.href}
                         className={`ml-4 text-sm font-medium ${
-                          item.current 
-                            ? 'text-indigo-600 dark:text-indigo-400' 
+                          item.current
+                            ? 'text-indigo-600 dark:text-indigo-400'
                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                         }`}
                         aria-current={item.current ? 'page' : undefined}
@@ -545,7 +545,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </ol>
             </nav>
           </div>
-          
+
           <div className="flex-1 px-4 flex justify-between">
             <div className="flex-1 flex">
               <form className="w-full flex md:ml-0" onSubmit={handleSearch}>
@@ -568,7 +568,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
               </form>
             </div>
-            
+
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
               {/* System status indicator */}
               <div className="flex items-center">
@@ -581,7 +581,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                    systemStatus.status === 'degraded' ? t.degraded : t.outage}
                 </span>
               </div>
-              
+
               {/* Language toggle */}
               <button
                 type="button"
@@ -591,7 +591,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <span className="sr-only">Change language</span>
                 <Globe className="h-6 w-6" aria-hidden="true" />
               </button>
-              
+
               {/* Dark mode toggle */}
               <button
                 type="button"
@@ -607,7 +607,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Moon className="h-6 w-6" aria-hidden="true" />
                 )}
               </button>
-              
+
               {/* Notifications dropdown */}
               <div className="relative">
                 <button
@@ -625,7 +625,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     )}
                   </div>
                 </button>
-                
+
                 {isNotificationsOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
@@ -690,7 +690,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                 )}
               </div>
-              
+
               {/* User dropdown */}
               <div className="relative">
                 <button
@@ -703,7 +703,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <User className="h-5 w-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                   </div>
                 </button>
-                
+
                 {isUserMenuOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
@@ -759,7 +759,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
         </div>
-        
+
         {/* Main content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
           <div className="py-6">

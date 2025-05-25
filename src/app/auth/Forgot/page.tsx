@@ -50,23 +50,23 @@ export default function ForgotPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Reset error
     setError('');
-    
+
     // Validate email
     if (!email) {
       setError(t.emailRequired);
       return;
     }
-    
+
     if (!validateEmail(email)) {
       setError(t.invalidEmail);
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       // API call would go here
       // const response = await fetch('/api/forgot-password', {
@@ -74,10 +74,10 @@ export default function ForgotPassword() {
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify({ email })
       // });
-      
+
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Simulate successful submission
       setSubmitted(true);
     } catch (error) {
@@ -94,24 +94,35 @@ export default function ForgotPassword() {
         <title>GCE Cameroon - {t.title}</title>
         <meta name="description" content="Forgot password page for GCE Examination System" />
       </Head>
-      
+
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex justify-end mb-4 mx-4">
-            <button 
-              onClick={() => setLanguage('en')} 
+            <button
+              onClick={() => setLanguage('en')}
               className={`px-3 py-1 rounded ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
             >
               EN
             </button>
-            <button 
-              onClick={() => setLanguage('fr')} 
+            <button
+              onClick={() => setLanguage('fr')}
               className={`px-3 py-1 rounded ml-2 ${language === 'fr' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
             >
               FR
             </button>
           </div>
-          
+
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-200 p-2">
+              <img
+                src="/images/GCEB.png"
+                alt="GCE Board Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {t.title}
           </h2>
@@ -124,7 +135,7 @@ export default function ForgotPassword() {
                 <p className="text-sm text-gray-600 mb-6 text-center">
                   {t.subtitle}
                 </p>
-                
+
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -183,9 +194,9 @@ export default function ForgotPassword() {
                 </p>
               </div>
             )}
-            
+
             <div className="mt-6">
-              <Link href="/login" 
+              <Link href="/auth/Login"
                 className="flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-500">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t.backToLogin}
