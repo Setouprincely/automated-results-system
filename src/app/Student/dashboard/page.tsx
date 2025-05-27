@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import StudentLayout from '@/components/layouts/StudentLayout';
+import { useStudentProfile, useStudentExams, useStudentResults } from '@/lib/hooks/useStudent';
 import {
   Card,
   CardContent,
@@ -25,49 +26,36 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-// Mock data - Replace with actual API calls
-const studentInfo = {
-  id: 'GCE2025-78956',
-  name: 'Jean-Michel Fopa',
-  photo: '/images/prince.jpg', // Student profile picture
-  center: 'GBHS Limbe',
-  level: 'Advanced Level (A Level)',
-  registrationStatus: 'Confirmed',
-  examStatus: 'Upcoming',
-  subjects: [
-    { code: 'ALG', name: 'English Literature', status: 'Registered' },
-    { code: 'AFR', name: 'French', status: 'Registered' },
-    { code: 'AMH', name: 'Mathematics', status: 'Registered' },
-    { code: 'APY', name: 'Physics', status: 'Registered' },
-    { code: 'ACY', name: 'Chemistry', status: 'Registered' }
-  ],
-  notifications: [
-    { id: 1, type: 'info', message: 'Examination timetable has been released', date: '2025-05-12' },
-    { id: 2, type: 'warning', message: 'Confirm your examination center details', date: '2025-05-10' },
-    { id: 3, type: 'success', message: 'Registration successfully processed', date: '2025-04-28' }
-  ],
-  upcomingExams: [
-    { subject: 'English Literature', date: '2025-06-10', time: '09:00 - 12:00', center: 'GBHS Limbe, Hall A' },
-    { subject: 'French', date: '2025-06-12', time: '09:00 - 12:00', center: 'GBHS Limbe, Hall A' },
-    { subject: 'Mathematics', date: '2025-06-15', time: '09:00 - 12:00', center: 'GBHS Limbe, Hall B' },
-    { subject: 'Physics', date: '2025-06-17', time: '09:00 - 12:00', center: 'GBHS Limbe, Hall A' },
-    { subject: 'Chemistry', date: '2025-06-19', time: '09:00 - 12:00', center: 'GBHS Limbe, Hall B' }
-  ],
-  pastResults: {
-    OLevel: {
-      year: 2023,
-      overall: 'A',
-      subjects: [
-        { name: 'English Language', grade: 'A' },
-        { name: 'Mathematics', grade: 'A' },
-        { name: 'Physics', grade: 'B' },
-        { name: 'Chemistry', grade: 'A' },
-        { name: 'Biology', grade: 'B' },
-        { name: 'Geography', grade: 'A' },
-        { name: 'Computer Science', grade: 'A' }
-      ]
+// Get current student ID from localStorage or use default
+const getCurrentStudentId = () => {
+  if (typeof window !== 'undefined') {
+    // Try to get from localStorage first
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      return storedUserId;
     }
+
+    // Check if user is logged in and get their ID
+    const authToken = localStorage.getItem('authToken');
+    const userType = localStorage.getItem('userType');
+
+    if (authToken && userType === 'student') {
+      // Extract user ID from token if possible
+      try {
+        const tokenParts = authToken.split('-');
+        if (tokenParts.length >= 3) {
+          const userId = tokenParts.slice(2, -1).join('-');
+          return userId;
+        }
+      } catch (error) {
+        console.log('Could not extract user ID from token');
+      }
+    }
+
+    // Fallback to default
+    return 'demo-student';
   }
+  return 'demo-student';
 };
 
 // Simple Progress component
@@ -85,6 +73,12 @@ const Progress = ({ value, className }: { value: number, className?: string }) =
 const StudentDashboard = () => {
   const [language, setLanguage] = useState<'english' | 'french'>('english');
 
+  // Get student data from API
+  const studentId = getCurrentStudentId();
+  const { data: studentInfo, loading: profileLoading, error: profileError } = useStudentProfile(studentId);
+  const { data: examData, loading: examLoading, error: examError } = useStudentExams(studentId);
+  const { data: resultsData, loading: resultsLoading, error: resultsError } = useStudentResults(studentId);
+
   // Translation function - In a real app, use a proper i18n library
   const t = (english: string, french: string) => {
     return language === 'english' ? english : french;
@@ -94,6 +88,56 @@ const StudentDashboard = () => {
   const toggleLanguage = () => {
     setLanguage(language === 'english' ? 'french' : 'english');
   };
+
+  // Loading state
+  if (profileLoading || examLoading || resultsLoading) {
+    return (
+      <StudentLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-700">{t('Loading dashboard...', 'Chargement du tableau de bord...')}</p>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  // Error state
+  if (profileError || examError || resultsError) {
+    return (
+      <StudentLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">
+              <AlertCircle className="h-12 w-12 mx-auto" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              {t('Error Loading Dashboard', 'Erreur de Chargement du Tableau de Bord')}
+            </h2>
+            <p className="text-gray-600">
+              {profileError || examError || resultsError}
+            </p>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  // Default values if no data
+  const student = (studentInfo as any) || {
+    id: 'GCE2025-ST-003421',
+    fullName: 'Student',
+    photoUrl: '/images/prince.jpg',
+    examLevel: 'Advanced Level (A Level)',
+    examCenter: 'Default Center',
+    registrationStatus: 'confirmed',
+    subjects: []
+  };
+
+  const upcomingExams = (examData as any)?.upcomingExams || [];
+  const notifications = (examData as any)?.notifications || [];
+  const pastResults = (resultsData as any)?.pastResults || null;
 
   return (
     <StudentLayout>
@@ -118,21 +162,21 @@ const StudentDashboard = () => {
             <div className="flex items-center gap-6">
               <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white">
                 <Image
-                  src={studentInfo.photo}
-                  alt={studentInfo.name}
+                  src={student.photoUrl}
+                  alt={student.fullName}
                   layout="fill"
                   objectFit="cover"
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold">{studentInfo.name}</h2>
-                <p className="text-blue-100">{t('Candidate ID:', 'ID du Candidat:')} {studentInfo.id}</p>
+                <h2 className="text-2xl font-bold">{student.fullName}</h2>
+                <p className="text-blue-100">{t('Candidate ID:', 'ID du Candidat:')} {student.id}</p>
                 <div className="flex gap-4 mt-2">
                   <Badge className="bg-white text-blue-700">
-                    {studentInfo.level}
+                    {student.examLevel}
                   </Badge>
                   <Badge className="bg-green-500">
-                    {t('Registration: ', 'Inscription: ')} {studentInfo.registrationStatus}
+                    {t('Registration: ', 'Inscription: ')} {student.registrationStatus}
                   </Badge>
                 </div>
               </div>
@@ -190,13 +234,13 @@ const StudentDashboard = () => {
                       <span>
                         {t('Subjects Registered:', 'Matières Inscrites:')}
                       </span>
-                      <span className="font-medium">{studentInfo.subjects.length}</span>
+                      <span className="font-medium">{student.subjects?.length || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>
                         {t('Examination Center:', 'Centre d\'Examen:')}
                       </span>
-                      <span className="font-medium">{studentInfo.center}</span>
+                      <span className="font-medium">{student.examCenter}</span>
                     </div>
                     <Button variant="outline" className="mt-2">
                       {t('View Details', 'Voir les Détails')}
@@ -215,7 +259,7 @@ const StudentDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-3">
-                    {studentInfo.notifications.map(notification => (
+                    {notifications.length > 0 ? notifications.map((notification: any) => (
                       <div key={notification.id} className="flex items-start gap-3 py-2 border-b last:border-0">
                         {notification.type === 'warning' && (
                           <span className="text-orange-500 mt-1"><AlertCircle size={16} /></span>
@@ -231,7 +275,9 @@ const StudentDashboard = () => {
                           <p className="text-xs text-gray-500">{notification.date}</p>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-sm text-gray-500">{t('No notifications', 'Aucune notification')}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -246,31 +292,37 @@ const StudentDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">
-                        {studentInfo.upcomingExams[0].subject}
-                      </h3>
-                      <Badge>
-                        {studentInfo.upcomingExams[0].date}
-                      </Badge>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{t('Time:', 'Heure:')}</span>
-                        <span className="font-medium">{studentInfo.upcomingExams[0].time}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>{t('Location:', 'Lieu:')}</span>
-                        <span className="font-medium">{studentInfo.upcomingExams[0].center}</span>
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500 mb-1">{t('Countdown:', 'Compte à rebours:')}</p>
-                      <Progress value={65} className="h-2" />
-                      <p className="text-xs text-right mt-1 text-gray-500">
-                        {t('23 days remaining', '23 jours restants')}
-                      </p>
-                    </div>
+                    {upcomingExams.length > 0 ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold text-lg">
+                            {upcomingExams[0].subject}
+                          </h3>
+                          <Badge>
+                            {upcomingExams[0].date}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-between text-sm">
+                            <span>{t('Time:', 'Heure:')}</span>
+                            <span className="font-medium">{upcomingExams[0].time}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>{t('Location:', 'Lieu:')}</span>
+                            <span className="font-medium">{upcomingExams[0].center}</span>
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-500 mb-1">{t('Countdown:', 'Compte à rebours:')}</p>
+                          <Progress value={65} className="h-2" />
+                          <p className="text-xs text-right mt-1 text-gray-500">
+                            {t('23 days remaining', '23 jours restants')}
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-500">{t('No upcoming exams', 'Aucun examen à venir')}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -290,14 +342,14 @@ const StudentDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {studentInfo.subjects.map((subject) => (
+                  {student.subjects && student.subjects.length > 0 ? student.subjects.map((subject: any) => (
                     <div
                       key={subject.code}
                       className="p-4 border rounded-md flex items-center justify-between hover:bg-gray-50"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold">
-                          {subject.code[1]}
+                          {subject.code?.[1] || 'S'}
                         </div>
                         <div>
                           <p className="font-medium">{subject.name}</p>
@@ -308,7 +360,11 @@ const StudentDashboard = () => {
                         {subject.status}
                       </Badge>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="col-span-full text-center py-8">
+                      <p className="text-gray-500">{t('No subjects registered', 'Aucune matière inscrite')}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -329,7 +385,7 @@ const StudentDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {studentInfo.upcomingExams.map((exam, index) => (
+                  {upcomingExams.length > 0 ? upcomingExams.map((exam: any, index: number) => (
                     <div
                       key={index}
                       className="p-4 border rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50"
@@ -359,7 +415,11 @@ const StudentDashboard = () => {
                         </Button>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">{t('No upcoming exams scheduled', 'Aucun examen programmé')}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -399,7 +459,7 @@ const StudentDashboard = () => {
 
           {/* Results Tab Content */}
           <TabsContent value="results" className="space-y-6">
-            {studentInfo.pastResults ? (
+            {pastResults ? (
               <>
                 <Card>
                   <CardHeader>
@@ -418,7 +478,7 @@ const StudentDashboard = () => {
                         <div className="bg-blue-50 p-6 rounded-lg text-center">
                           <p className="text-sm text-blue-700 mb-1">{t('Overall Grade', 'Note Globale')}</p>
                           <div className="text-5xl font-bold text-blue-700 flex justify-center">
-                            {studentInfo.pastResults.OLevel.overall}
+                            {pastResults.OLevel?.overall || 'N/A'}
                           </div>
                           <div className="mt-4 flex justify-center">
                             <Badge className="bg-blue-700">{t('Passed', 'Réussi')}</Badge>
@@ -431,7 +491,7 @@ const StudentDashboard = () => {
                       </div>
                       <div className="sm:w-2/3">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {studentInfo.pastResults.OLevel.subjects.map((subject, index) => (
+                          {pastResults?.OLevel?.subjects?.map((subject: any, index: number) => (
                             <div
                               key={index}
                               className="flex justify-between items-center p-3 border rounded-md"

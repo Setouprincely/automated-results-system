@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ExaminationLayout from '@/components/layouts/ExaminationLayout';
+import { useApi } from '@/lib/hooks/useApi';
+import { examinationApi } from '@/lib/api';
 import {
   Card,
   CardContent,
@@ -162,14 +164,22 @@ const regions = [
 export default function ExaminationCentersPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [centers, setCenters] = useState<ExaminationCenter[]>(mockCenters);
-  const [filteredCenters, setFilteredCenters] = useState<ExaminationCenter[]>(mockCenters);
+  const [filteredCenters, setFilteredCenters] = useState<ExaminationCenter[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCenter, setSelectedCenter] = useState<ExaminationCenter | null>(null);
   const [activeTab, setActiveTab] = useState('all');
   const [filterRegion, setFilterRegion] = useState('all');
+
+  // Get centers data from API
+  const { data: centersData, loading, error, refetch } = useApi(
+    () => examinationApi.getCenters(),
+    []
+  );
+
+  // Use API data or fallback to mock data
+  const centers = (centersData as ExaminationCenter[]) || mockCenters;
 
   // Form state for adding/editing centers
   const [formData, setFormData] = useState<Omit<ExaminationCenter, 'id'>>({
@@ -257,37 +267,43 @@ export default function ExaminationCentersPage() {
   };
 
   // Save new center
-  const handleSaveCenter = () => {
-    const newCenter: ExaminationCenter = {
-      id: `new-${Date.now()}`,
-      ...formData
-    };
-    setCenters([...centers, newCenter]);
-    setIsAddDialogOpen(false);
+  const handleSaveCenter = async () => {
+    try {
+      await examinationApi.createCenter(formData);
+      setIsAddDialogOpen(false);
+      refetch(); // Refresh the data
+    } catch (error) {
+      console.error('Error creating center:', error);
+      // In a real app, show error notification
+    }
   };
 
   // Update existing center
-  const handleUpdateCenter = () => {
+  const handleUpdateCenter = async () => {
     if (!selectedCenter) return;
 
-    const updatedCenters = centers.map(center =>
-      center.id === selectedCenter.id ? { ...center, ...formData } : center
-    );
-
-    setCenters(updatedCenters);
-    setIsEditDialogOpen(false);
+    try {
+      await examinationApi.updateCenter(selectedCenter.id, formData);
+      setIsEditDialogOpen(false);
+      refetch(); // Refresh the data
+    } catch (error) {
+      console.error('Error updating center:', error);
+      // In a real app, show error notification
+    }
   };
 
   // Delete center
-  const handleDeleteCenter = () => {
+  const handleDeleteCenter = async () => {
     if (!selectedCenter) return;
 
-    const updatedCenters = centers.filter(center =>
-      center.id !== selectedCenter.id
-    );
-
-    setCenters(updatedCenters);
-    setIsDeleteDialogOpen(false);
+    try {
+      await examinationApi.deleteCenter(selectedCenter.id);
+      setIsDeleteDialogOpen(false);
+      refetch(); // Refresh the data
+    } catch (error) {
+      console.error('Error deleting center:', error);
+      // In a real app, show error notification
+    }
   };
 
   // Handle form input changes
@@ -335,6 +351,40 @@ export default function ExaminationCentersPage() {
         return <Badge>{status}</Badge>;
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <ExaminationLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-lg font-medium">Loading examination centers...</p>
+          </div>
+        </div>
+      </ExaminationLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <ExaminationLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">
+              <MapPin className="h-16 w-16 mx-auto" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Centers</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={refetch}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </ExaminationLayout>
+    );
+  }
 
   return (
     <ExaminationLayout>

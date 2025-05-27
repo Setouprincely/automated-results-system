@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import SchoolsLayout from '@/components/layouts/SchoolsLayout';
+import { schoolsApi } from '@/lib/api';
+import { useApi } from '@/lib/hooks/useApi';
 import {
   BarChart, Users, BookOpen,
   CheckCircle, AlertCircle, Download, FileText
@@ -67,23 +69,21 @@ const mockUpcomingEvents = [
 ];
 
 export default function SchoolDashboard() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats] = useState(mockStats);
-  const [performanceTrend] = useState(mockPerformanceTrend);
-  const [subjectPerformance] = useState(mockSubjectPerformance);
-  const [notifications] = useState(mockNotifications);
-  const [upcomingEvents] = useState(mockUpcomingEvents);
   const [activeTab, setActiveTab] = useState('overview');
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
-  // Simulate loading data
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+  // Get dashboard data from API
+  const { data: dashboardData, loading: isLoading, error } = useApi(
+    () => schoolsApi.getDashboardStats(),
+    []
+  );
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Extract data with fallbacks
+  const stats = (dashboardData as any)?.stats || mockStats;
+  const performanceTrend = (dashboardData as any)?.performanceTrend || mockPerformanceTrend;
+  const subjectPerformance = (dashboardData as any)?.subjectPerformance || mockSubjectPerformance;
+  const notifications = (dashboardData as any)?.notifications || mockNotifications;
+  const upcomingEvents = (dashboardData as any)?.upcomingEvents || mockUpcomingEvents;
 
   // Language translations (simplified for demonstration)
   const translations = {
@@ -148,6 +148,20 @@ export default function SchoolDashboard() {
       <SchoolsLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </SchoolsLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <SchoolsLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
+            <p className="text-gray-600">{error}</p>
+          </div>
         </div>
       </SchoolsLayout>
     );

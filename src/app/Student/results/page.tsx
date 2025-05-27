@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import StudentLayout from '@/components/layouts/StudentLayout';
+import { useStudentProfile, useStudentResults } from '@/lib/hooks/useStudent';
 import {
   Card,
   CardContent,
@@ -17,54 +18,73 @@ import { Download, Printer, Share2, Award, BarChart3, AlertCircle } from "lucide
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-// Mock data - in real implementation this would come from an API
-const studentInfo = {
-  name: "John Doe",
-  candidateNumber: "CM22-A5678",
-  center: "Government High School Limbe",
-  examSession: "June 2025",
-  level: "Advanced Level",
-  photo: "/images/prince.jpg" // In production this would be stored securely
-};
-
-const resultsData = {
-  oLevel: {
-    year: "2023",
-    overallGrade: "Merit",
-    subjects: [
-      { name: "English Language", grade: "A", score: 85 },
-      { name: "Mathematics", grade: "B", score: 78 },
-      { name: "Physics", grade: "A", score: 88 },
-      { name: "Chemistry", grade: "B", score: 75 },
-      { name: "Biology", grade: "A", score: 87 },
-      { name: "Computer Science", grade: "A*", score: 92 },
-      { name: "French", grade: "C", score: 65 },
-      { name: "History", grade: "B", score: 74 }
-    ]
-  },
-  aLevel: {
-    year: "2025",
-    overallGrade: "Distinction",
-    subjects: [
-      { name: "Mathematics", grade: "A", score: 85, ucasPoints: 48 },
-      { name: "Physics", grade: "A*", score: 92, ucasPoints: 56 },
-      { name: "Chemistry", grade: "B", score: 75, ucasPoints: 40 },
-      { name: "Computer Science", grade: "A", score: 87, ucasPoints: 48 }
-    ],
-    totalUCASPoints: 192
+// Get current student ID from localStorage or use default
+const getCurrentStudentId = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('userId') || 'GCE2025-ST-003421';
   }
+  return 'GCE2025-ST-003421';
 };
 
 export default function StudentResults() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [resultsVerified] = useState(true); // Removed unused setter
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
-  // Remove artificial delay for better performance
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  // Get student data from API
+  const studentId = getCurrentStudentId();
+  const { data: studentProfile, loading: profileLoading, error: profileError } = useStudentProfile(studentId);
+  const { data: resultsResponse, loading: resultsLoading, error: resultsError } = useStudentResults(studentId);
+
+  // Combine loading states
+  const loading = profileLoading || resultsLoading;
+  const error = profileError || resultsError;
+
+  // Transform API data to match our interface
+  const studentInfo = studentProfile ? {
+    name: (studentProfile as any).fullName || "Student",
+    candidateNumber: (studentProfile as any).id || studentId,
+    center: (studentProfile as any).examCenter || "Default Center",
+    examSession: "June 2025",
+    level: (studentProfile as any).examLevel || "Advanced Level",
+    photo: (studentProfile as any).photoUrl || "/images/prince.jpg"
+  } : {
+    name: "Student",
+    candidateNumber: studentId,
+    center: "Default Center",
+    examSession: "June 2025",
+    level: "Advanced Level",
+    photo: "/images/prince.jpg"
+  };
+
+  // Default results data with API fallback
+  const resultsData = (resultsResponse as any) || {
+    oLevel: {
+      year: "2023",
+      overallGrade: "Merit",
+      subjects: [
+        { name: "English Language", grade: "A", score: 85 },
+        { name: "Mathematics", grade: "B", score: 78 },
+        { name: "Physics", grade: "A", score: 88 },
+        { name: "Chemistry", grade: "B", score: 75 },
+        { name: "Biology", grade: "A", score: 87 },
+        { name: "Computer Science", grade: "A*", score: 92 },
+        { name: "French", grade: "C", score: 65 },
+        { name: "History", grade: "B", score: 74 }
+      ]
+    },
+    aLevel: {
+      year: "2025",
+      overallGrade: "Distinction",
+      subjects: [
+        { name: "Mathematics", grade: "A", score: 85, ucasPoints: 48 },
+        { name: "Physics", grade: "A*", score: 92, ucasPoints: 56 },
+        { name: "Chemistry", grade: "B", score: 75, ucasPoints: 40 },
+        { name: "Computer Science", grade: "A", score: 87, ucasPoints: 48 }
+      ],
+      totalUCASPoints: 192
+    }
+  };
 
   // Toggle language function
   const toggleLanguage = () => {
@@ -165,6 +185,28 @@ export default function StudentResults() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-lg font-medium">{t.loading}</p>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <StudentLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              {language === 'en' ? 'Error Loading Results' : 'Erreur de Chargement des Résultats'}
+            </h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {language === 'en' ? 'Retry' : 'Réessayer'}
+            </button>
           </div>
         </div>
       </StudentLayout>

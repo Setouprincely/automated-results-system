@@ -1,0 +1,178 @@
+// Prisma Schema for GCE System with Separate Schemas for Each User Type
+// This ensures complete isolation between different user types
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["student_auth", "teacher_auth", "examiner_auth", "admin_auth", "public"]
+}
+
+// Student users in separate schema for complete isolation
+model StudentUser {
+  id                 String   @id @default(cuid())
+  fullName          String
+  email             String   @unique
+  passwordHash      String
+  registrationStatus String  @default("pending") // pending, confirmed, suspended
+  emailVerified     Boolean  @default(false)
+
+  // Student-specific fields
+  examLevel         String?  // "O Level" or "A Level"
+  examCenter        String?
+  centerCode        String?
+  candidateNumber   String?
+  dateOfBirth       String?
+  subjects          Json?    // Array of subjects as JSON
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  lastLogin         DateTime?
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+  @@schema("student_auth")
+}
+
+// Teacher users in separate schema
+model TeacherUser {
+  id                 String   @id @default(cuid())
+  fullName          String
+  email             String   @unique
+  passwordHash      String
+  registrationStatus String  @default("pending")
+  emailVerified     Boolean  @default(false)
+
+  // Teacher-specific fields
+  school            String?
+  teachingSubjects  Json?    // Array of subjects they teach
+  qualifications    Json?    // Teaching qualifications
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  lastLogin         DateTime?
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+  @@schema("teacher_auth")
+}
+
+// Examiner users in separate schema
+model ExaminerUser {
+  id                 String   @id @default(cuid())
+  fullName          String
+  email             String   @unique
+  passwordHash      String
+  registrationStatus String  @default("pending")
+  emailVerified     Boolean  @default(false)
+
+  // Examiner-specific fields
+  specialization    String?  // Subject specialization
+  examiningLevel    String?  // O Level, A Level, or both
+  certifications    Json?    // Examining certifications
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  lastLogin         DateTime?
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+  @@schema("examiner_auth")
+}
+
+// Admin users in separate schema
+model AdminUser {
+  id                 String   @id @default(cuid())
+  fullName          String
+  email             String   @unique
+  passwordHash      String
+  registrationStatus String  @default("pending")
+  emailVerified     Boolean  @default(false)
+
+  // Admin-specific fields
+  role              String?  // super_admin, regional_admin, center_admin
+  permissions       Json?    // Array of permissions
+  region            String?  // Assigned region
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  lastLogin         DateTime?
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+  @@schema("admin_auth")
+}
+
+// Shared data in public schema (accessible by all user types)
+model Subject {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "ALG", "AMH", "APY"
+  name        String   // e.g., "English Literature", "Mathematics"
+  level       String   // "O Level" or "A Level"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("subjects")
+  @@schema("public")
+}
+
+model ExamCenter {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "GBHS-001"
+  name        String   // e.g., "Government High School Limbe"
+  location    String   // City/Region
+  address     String?
+  capacity    Int      // Maximum number of candidates
+  facilities  Json?    // Available facilities
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("exam_centers")
+  @@schema("public")
+}
+
+model ExamSession {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "June 2025 GCE"
+  level       String   // "O Level" or "A Level"
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+
+  // Registration periods
+  registrationStart DateTime
+  registrationEnd   DateTime
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("exam_sessions")
+  @@schema("public")
+}
+
+// Audit log for tracking all database changes (security requirement)
+model AuditLog {
+  id          String   @id @default(cuid())
+  tableName   String   // Which table was affected
+  recordId    String   // ID of the affected record
+  action      String   // INSERT, UPDATE, DELETE
+  oldValues   Json?    // Previous values (for UPDATE/DELETE)
+  newValues   Json?    // New values (for INSERT/UPDATE)
+  userType    String   // student, teacher, examiner, admin
+  userId      String   // Who made the change
+  userEmail   String   // Email of user who made the change
+  ipAddress   String?  // IP address of the request
+  userAgent   String?  // Browser/client information
+  timestamp   DateTime @default(now())
+
+  @@map("audit_logs")
+  @@schema("public")
+}

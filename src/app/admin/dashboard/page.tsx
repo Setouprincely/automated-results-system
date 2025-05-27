@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/layouts/AdminLayout';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useAdminDashboardStats } from '@/lib/hooks/useAdmin';
 import {
   BarChart,
   PieChart,
@@ -15,73 +16,26 @@ import {
   AlertTriangle,
   Server,
   Globe,
-  ChevronRight
+  ChevronRight,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 
-// Mock data - replace with actual API calls
-const mockStatistics = {
-  totalUsers: 8750,
-  activeExaminations: 12,
-  pendingResults: 4,
-  systemStatus: "Operational",
-  serverUptime: "99.98%",
-  todayLogins: 243,
-  storageUsed: "68%"
-};
-
-const mockAlerts = [
-  { id: 1, level: 'warning', message: 'Database backup scheduled for tonight at 01:00', time: '3h ago' },
-  { id: 2, level: 'error', message: 'Failed login attempts detected from IP 192.168.1.45', time: '5h ago' },
-  { id: 3, level: 'info', message: 'System update v2.4.1 available', time: '1d ago' },
-  { id: 4, level: 'success', message: 'O Level Chemistry results published successfully', time: '1d ago' },
-];
-
-const mockRecentActivity = [
-  { id: 1, action: 'User created', user: 'Jean Biya', details: 'Added new examiner account', time: '15m ago' },
-  { id: 2, action: 'Config changed', user: 'Admin', details: 'Updated grading algorithm for Physics', time: '2h ago' },
-  { id: 3, action: 'Results published', user: 'System', details: 'Geography A Level results published', time: '5h ago' },
-  { id: 4, action: 'Backup completed', user: 'System', details: 'Daily backup completed successfully', time: '6h ago' }
-];
-
 export default function AdminDashboard() {
-  const [language, setLanguage] = useState('en');
-  const [statistics, setStatistics] = useState(mockStatistics);
-  const [alerts, setAlerts] = useState(mockAlerts);
-  const [recentActivity, setRecentActivity] = useState(mockRecentActivity);
-  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState<'en' | 'fr'>('en');
 
-  useEffect(() => {
-    // Simulate API fetch
-    const fetchDashboardData = async () => {
-      try {
-        // Replace with actual API calls
-        // const statsResponse = await fetch('/api/admin/statistics');
-        // const stats = await statsResponse.json();
-        // setStatistics(stats);
+  // Replace mock data with real API call
+  const {
+    data: dashboardData,
+    loading,
+    error,
+    refetch
+  } = useAdminDashboardStats();
 
-        // const alertsResponse = await fetch('/api/admin/alerts');
-        // const alertsData = await alertsResponse.json();
-        // setAlerts(alertsData);
-
-        // const activityResponse = await fetch('/api/admin/activity');
-        // const activityData = await activityResponse.json();
-        // setRecentActivity(activityData);
-
-        // Using mock data for now
-        setTimeout(() => {
-          setStatistics(mockStatistics);
-          setAlerts(mockAlerts);
-          setRecentActivity(mockRecentActivity);
-          setLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
+  // Extract data from API response
+  const statistics = dashboardData?.stats || {};
+  const alerts = dashboardData?.alerts || [];
+  const recentActivity = dashboardData?.recentActivity || [];
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'fr' : 'en');
@@ -137,13 +91,36 @@ export default function AdminDashboard() {
 
   const t = translations[language];
 
+  // Loading state
   if (loading) {
     return (
       <AdminLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto" />
             <p className="mt-4 text-gray-700">{t.loading}</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={refetch}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </button>
           </div>
         </div>
       </AdminLayout>
@@ -183,7 +160,7 @@ export default function AdminDashboard() {
                       <UsersIcon className="h-5 w-5 text-blue-500 mr-2" />
                       <h3 className="text-sm font-medium text-blue-900">{t.totalUsers}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-blue-900">{statistics.totalUsers}</p>
+                    <p className="text-2xl font-bold text-blue-900">{statistics.totalUsers?.toLocaleString() || '0'}</p>
                   </div>
 
                   <div className="bg-green-50 p-4 rounded-lg">
@@ -191,7 +168,7 @@ export default function AdminDashboard() {
                       <FileText className="h-5 w-5 text-green-500 mr-2" />
                       <h3 className="text-sm font-medium text-green-900">{t.activeExams}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-green-900">{statistics.activeExaminations}</p>
+                    <p className="text-2xl font-bold text-green-900">{statistics.activeExaminations || '0'}</p>
                   </div>
 
                   <div className="bg-yellow-50 p-4 rounded-lg">
@@ -199,7 +176,7 @@ export default function AdminDashboard() {
                       <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
                       <h3 className="text-sm font-medium text-yellow-900">{t.pendingResults}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-yellow-900">{statistics.pendingResults}</p>
+                    <p className="text-2xl font-bold text-yellow-900">{statistics.pendingResults || '0'}</p>
                   </div>
 
                   <div className="bg-indigo-50 p-4 rounded-lg">
@@ -207,7 +184,7 @@ export default function AdminDashboard() {
                       <Activity className="h-5 w-5 text-indigo-500 mr-2" />
                       <h3 className="text-sm font-medium text-indigo-900">{t.systemStatus}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-indigo-900">{statistics.systemStatus}</p>
+                    <p className="text-2xl font-bold text-indigo-900">{statistics.systemStatus || 'Unknown'}</p>
                   </div>
 
                   <div className="bg-purple-50 p-4 rounded-lg">
@@ -215,7 +192,7 @@ export default function AdminDashboard() {
                       <Server className="h-5 w-5 text-purple-500 mr-2" />
                       <h3 className="text-sm font-medium text-purple-900">{t.serverUptime}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-purple-900">{statistics.serverUptime}</p>
+                    <p className="text-2xl font-bold text-purple-900">{statistics.serverUptime || 'N/A'}</p>
                   </div>
 
                   <div className="bg-pink-50 p-4 rounded-lg">
@@ -223,7 +200,7 @@ export default function AdminDashboard() {
                       <UsersIcon className="h-5 w-5 text-pink-500 mr-2" />
                       <h3 className="text-sm font-medium text-pink-900">{t.todayLogins}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-pink-900">{statistics.todayLogins}</p>
+                    <p className="text-2xl font-bold text-pink-900">{statistics.todayLogins || '0'}</p>
                   </div>
 
                   <div className="bg-red-50 p-4 rounded-lg">
@@ -231,7 +208,7 @@ export default function AdminDashboard() {
                       <Database className="h-5 w-5 text-red-500 mr-2" />
                       <h3 className="text-sm font-medium text-red-900">{t.storageUsed}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-red-900">{statistics.storageUsed}</p>
+                    <p className="text-2xl font-bold text-red-900">{statistics.storageUsed || 'N/A'}</p>
                   </div>
                 </div>
               </div>

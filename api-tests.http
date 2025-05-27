@@ -1,0 +1,359 @@
+# 🧪 GCE System API Tests
+# Use with VS Code REST Client extension
+# Click "Send Request" above each request to test
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 🔐 Authentication Tests
+
+# Register new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "fullName": "Test User",
+  "email": "test@example.com",
+  "password": "Password123!",
+  "userType": "student",
+  "dateOfBirth": "2000-01-01"
+}
+
+###
+
+# Login user
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "password": "Password123!"
+}
+
+###
+
+# Get all registered users (admin)
+GET {{baseUrl}}/api/auth/register
+
+###
+
+# Logout user
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer your-token-here
+
+###
+
+# Forgot password
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com"
+}
+
+###
+
+# Verify reset token
+GET {{baseUrl}}/api/auth/forgot-password?token=sample-token
+
+###
+
+# Send email verification
+POST {{baseUrl}}/api/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "userId": "test-user-id",
+  "userName": "Test User"
+}
+
+###
+
+# Verify email token
+GET {{baseUrl}}/api/auth/verify-email?token=sample-token
+
+###
+
+### 🎓 Student Tests
+
+# Get all students
+GET {{baseUrl}}/api/students
+
+###
+
+# Get specific student
+GET {{baseUrl}}/api/students/GCE2025-ST-003421
+
+###
+
+# Get student results
+GET {{baseUrl}}/api/students/GCE2025-ST-003421/results
+
+###
+
+# Get student exams
+GET {{baseUrl}}/api/students/GCE2025-ST-003421/exams
+
+###
+
+### 📝 Registration Tests
+
+# Get all subjects
+GET {{baseUrl}}/api/registration/subjects
+
+###
+
+# Get O Level subjects
+GET {{baseUrl}}/api/registration/subjects?level=O Level
+
+###
+
+# Get core subjects
+GET {{baseUrl}}/api/registration/subjects?category=core
+
+###
+
+# Get all schools
+GET {{baseUrl}}/api/registration/schools
+
+###
+
+# Search students
+GET {{baseUrl}}/api/registration/students/search
+
+###
+
+# Search students by name
+GET {{baseUrl}}/api/registration/students/search?q=john
+
+###
+
+# Get payment status
+GET {{baseUrl}}/api/registration/payment/status/sample-id
+
+###
+
+### 🏫 Examination Tests
+
+# Get all exam centers
+GET {{baseUrl}}/api/examinations/centers
+
+###
+
+# Get centers by region
+GET {{baseUrl}}/api/examinations/centers?region=Centre
+
+###
+
+# Get centers by type
+GET {{baseUrl}}/api/examinations/centers?centerType=primary
+
+###
+
+# Get exam schedules
+GET {{baseUrl}}/api/examinations/schedule
+
+###
+
+# Get O Level schedules
+GET {{baseUrl}}/api/examinations/schedule?examLevel=O Level
+
+###
+
+# Get exam materials
+GET {{baseUrl}}/api/examinations/materials
+
+###
+
+# Get attendance records
+GET {{baseUrl}}/api/examinations/attendance
+
+###
+
+# Get incident reports
+GET {{baseUrl}}/api/examinations/incidents
+
+###
+
+# Get invigilator assignments
+GET {{baseUrl}}/api/examinations/assign-invigilators
+
+###
+
+### 📊 Grading Tests
+
+# Get grade boundaries
+GET {{baseUrl}}/api/grading/grade-boundaries
+
+###
+
+# Get quality assurance dashboard
+GET {{baseUrl}}/api/grading/quality-assurance
+
+###
+
+### ✏️ Marking Tests
+
+# Get marking scores
+GET {{baseUrl}}/api/marking/scores
+
+###
+
+# Get script allocations
+GET {{baseUrl}}/api/marking/allocate-scripts
+
+###
+
+# Get chief examiner reviews
+GET {{baseUrl}}/api/marking/chief-examiner-review
+
+###
+
+# Get marking analytics
+GET {{baseUrl}}/api/marking/performance-analytics
+
+###
+
+# Get double marking verifications
+GET {{baseUrl}}/api/marking/verify-double-marking
+
+###
+
+### 📋 Results Tests
+
+# Get certificates
+GET {{baseUrl}}/api/results/certificates
+
+###
+
+# Get result statistics
+GET {{baseUrl}}/api/results/statistics
+
+###
+
+# Get result notifications
+GET {{baseUrl}}/api/results/notifications
+
+###
+
+# Get result generation status
+GET {{baseUrl}}/api/results/generate
+
+###
+
+# Get publication status
+GET {{baseUrl}}/api/results/publish
+
+###
+
+# Get verification status
+GET {{baseUrl}}/api/results/verify
+
+###
+
+### 👑 Admin Tests
+
+# Get admin dashboard stats
+GET {{baseUrl}}/api/admin/dashboard/stats
+
+###
+
+# Get system health
+GET {{baseUrl}}/api/admin/system-health
+
+###
+
+# Get audit logs
+GET {{baseUrl}}/api/admin/audit-logs
+
+###
+
+# Get user activity
+GET {{baseUrl}}/api/admin/user-activity
+
+###
+
+# Get bulk operations
+GET {{baseUrl}}/api/admin/bulk-operations
+
+###
+
+# Get system config
+GET {{baseUrl}}/api/admin/system-config
+
+###
+
+### 📈 Analytics Tests
+
+# Get student performance
+GET {{baseUrl}}/api/analytics/performance/student
+
+###
+
+# Get school performance
+GET {{baseUrl}}/api/analytics/performance/school
+
+###
+
+# Get region performance
+GET {{baseUrl}}/api/analytics/performance/region
+
+###
+
+# Get subject performance
+GET {{baseUrl}}/api/analytics/subject-performance
+
+###
+
+# Get comparative analysis
+GET {{baseUrl}}/api/analytics/comparative-analysis
+
+###
+
+# Get examiner metrics
+GET {{baseUrl}}/api/analytics/examiner-metrics
+
+###
+
+### 📄 Reports Tests
+
+# Get report templates
+GET {{baseUrl}}/api/reports/templates
+
+###
+
+# Get custom reports
+GET {{baseUrl}}/api/reports/custom
+
+###
+
+### 👥 User Management Tests
+
+# Search users
+GET {{baseUrl}}/api/users/search
+
+###
+
+# Get user profile
+GET {{baseUrl}}/api/users/profile
+
+###
+
+# Create new user
+POST {{baseUrl}}/api/users/create
+Content-Type: {{contentType}}
+
+{
+  "fullName": "New User",
+  "email": "newuser@example.com",
+  "password": "Password123!",
+  "userType": "teacher"
+}
+
+###
+
+# Get user by ID
+GET {{baseUrl}}/api/users/sample-user-id
+
+###

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { authApi } from '@/lib/api';
 
 export default function Login() {
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
@@ -66,30 +67,63 @@ export default function Login() {
     setError('');
 
     try {
-      // This would be replaced with your actual authentication API call
-      // Remove artificial delay for better performance
+      // Map frontend userType to backend userType
+      const backendUserType = userType === 'school' ? 'teacher' :
+                             userType === 'examBoard' ? 'examiner' :
+                             userType;
 
-      // Redirect to appropriate dashboard based on user type
-      switch(userType) {
-        case 'admin':
-          router.push('/admin/dashboard');
-          break;
-        case 'examBoard':
-          router.push('/Examination/Examboard');
-          break;
-        case 'examiner':
-          router.push('/Examinar/dashboard');
-          break;
-        case 'school':
-          router.push('/Schools/dashboard');
-          break;
-        case 'student':
-        default:
-          router.push('/Student/dashboard');
-          break;
+      // Real API authentication call
+      const response = await authApi.login({
+        email,
+        password,
+        userType: backendUserType
+      });
+
+      if (response.success && response.data) {
+        // Store authentication token
+        const userData = response.data as any;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', userData.token);
+          localStorage.setItem('userType', userData.userType);
+          localStorage.setItem('userId', userData.id);
+          localStorage.setItem('userName', userData.name);
+        }
+
+        // Redirect to appropriate dashboard based on user type
+        switch(userType) {
+          case 'admin':
+            router.push('/admin/dashboard');
+            break;
+          case 'examBoard':
+            router.push('/Examination/Examboard');
+            break;
+          case 'examiner':
+            router.push('/Examinar/dashboard');
+            break;
+          case 'school':
+            router.push('/Schools/dashboard');
+            break;
+          case 'student':
+          default:
+            router.push('/Student/dashboard');
+            break;
+        }
+      } else {
+        // Handle specific error types
+        const errorResponse = response as any;
+        if (errorResponse.requiresEmailVerification) {
+          setError('Please verify your email address before logging in. Check your inbox for the verification link.');
+        } else if (errorResponse.message?.includes('suspended')) {
+          setError('Your account has been suspended. Please contact support for assistance.');
+        } else if (errorResponse.message?.includes('pending')) {
+          setError('Your account is pending approval. Please wait for confirmation.');
+        } else {
+          setError(errorResponse.message || t.errorInvalid);
+        }
       }
     } catch (err) {
-      setError(t.errorInvalid);
+      console.error('Login error:', err);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }

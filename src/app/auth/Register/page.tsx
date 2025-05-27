@@ -214,11 +214,32 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Mock API response
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Call real registration API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          userType
+        }),
+      });
 
-      // Simulate successful registration
-      console.log('Registration form submitted:', { ...formData, userType });
+      const result = await response.json();
+
+      if (!result.success) {
+        setErrors({ form: result.message || t.registrationError });
+        return;
+      }
+
+      // Store authentication data
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', result.data.token);
+        localStorage.setItem('userType', result.data.userType);
+        localStorage.setItem('userId', result.data.id);
+        localStorage.setItem('userName', result.data.name);
+      }
 
       // Show success message
       alert(t.registrationSuccess);

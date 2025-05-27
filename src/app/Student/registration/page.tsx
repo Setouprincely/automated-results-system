@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StudentLayout from '@/components/layouts/StudentLayout';
 import Image from 'next/image';
-import { CheckCircle, AlertTriangle, Download, Printer, Share2 } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Download, Printer, Share2, Loader2, RefreshCw } from 'lucide-react';
+import { useStudentProfile } from '@/lib/hooks/useStudent';
 
 // Define types
 interface Subject {
@@ -30,39 +31,38 @@ interface RegistrationData {
   admissionCardStatus: 'ready' | 'not-ready';
 }
 
-// Mock data - In a real application, this would come from an API
-const mockRegistrationData: RegistrationData = {
-  status: 'confirmed',
-  studentId: 'GCE2025-ST-003421',
-  fullName: 'John Doe',
-  photoUrl: '/images/prince.jpg', // Student photo
-  examLevel: 'Advanced Level (A Level)',
-  examCenter: 'Buea Examination Center',
-  centerCode: 'BEC-023',
-  subjects: [
-    { code: 'AL01', name: 'Mathematics', status: 'confirmed' },
-    { code: 'AL02', name: 'Physics', status: 'confirmed' },
-    { code: 'AL03', name: 'Chemistry', status: 'confirmed' },
-    { code: 'AL04', name: 'Biology', status: 'pending' },
-  ],
-  paymentStatus: 'completed',
-  paymentReference: 'PMT-GCE-2025-098765',
-  registrationDate: '2025-01-15',
-  examDates: '2025-05-22 to 2025-06-18',
-  admissionCardStatus: 'ready',
+// Get current student ID from localStorage or use default
+const getCurrentStudentId = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('userId') || 'GCE2025-ST-003421';
+  }
+  return 'GCE2025-ST-003421';
 };
 
 const RegistrationConfirmation = () => {
   const router = useRouter();
-  const [registrationData, setRegistrationData] = useState<RegistrationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
-  useEffect(() => {
-    // Remove artificial delay for better performance
-    setRegistrationData(mockRegistrationData);
-    setIsLoading(false);
-  }, []);
+  // Get student registration data from API
+  const studentId = getCurrentStudentId();
+  const { data: studentData, loading: isLoading, error, refetch } = useStudentProfile(studentId);
+
+  // Transform API data to match our interface
+  const registrationData: RegistrationData | null = studentData ? {
+    status: (studentData as any).registrationStatus === 'confirmed' ? 'confirmed' : 'pending',
+    studentId: (studentData as any).id || studentId,
+    fullName: (studentData as any).fullName || 'Student',
+    photoUrl: (studentData as any).photoUrl || '/images/prince.jpg',
+    examLevel: (studentData as any).examLevel || 'Advanced Level (A Level)',
+    examCenter: (studentData as any).examCenter || 'Default Center',
+    centerCode: (studentData as any).centerCode || 'DC-001',
+    subjects: (studentData as any).subjects || [],
+    paymentStatus: 'completed',
+    paymentReference: `PMT-GCE-2025-${Date.now().toString().slice(-6)}`,
+    registrationDate: (studentData as any).createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+    examDates: '2025-05-22 to 2025-06-18',
+    admissionCardStatus: (studentData as any).registrationStatus === 'confirmed' ? 'ready' : 'not-ready',
+  } : null;
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'fr' : 'en');
@@ -173,8 +173,34 @@ const RegistrationConfirmation = () => {
         <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gray-50">
           <div className="w-full max-w-3xl px-4 py-8 mx-auto bg-white rounded-lg shadow-md">
             <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 border-4 border-t-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
+              <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
               <h2 className="text-xl font-semibold text-gray-700">{t.loading}</h2>
+            </div>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <StudentLayout>
+        <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gray-50">
+          <div className="w-full max-w-3xl px-4 py-8 mx-auto bg-white rounded-lg shadow-md">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <AlertTriangle className="w-16 h-16 text-red-500" />
+              <h2 className="text-xl font-semibold text-gray-700">
+                {language === 'en' ? 'Error Loading Registration' : 'Erreur de Chargement de l\'Inscription'}
+              </h2>
+              <p className="text-gray-600">{error}</p>
+              <button
+                onClick={refetch}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                {language === 'en' ? 'Retry' : 'Réessayer'}
+              </button>
             </div>
           </div>
         </div>

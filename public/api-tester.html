@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCE API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .endpoints {
+            padding: 20px;
+        }
+        
+        .endpoint {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        
+        .method {
+            padding: 5px 10px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 60px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .method.GET { background: #28a745; }
+        .method.POST { background: #007bff; }
+        .method.PUT { background: #ffc107; color: #000; }
+        .method.DELETE { background: #dc3545; }
+        
+        .path {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            color: #495057;
+        }
+        
+        .test-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #138496;
+        }
+        
+        .test-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .test-all-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+        }
+        
+        .test-all-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .summary h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            margin: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 GCE API Tester</h1>
+            <p>Test all your API endpoints with a single click</p>
+        </div>
+        
+        <div class="content">
+            <button class="test-all-btn" onclick="testAllEndpoints()">🚀 Test All APIs</button>
+            
+            <div class="test-section">
+                <div class="section-header">🔐 Authentication APIs</div>
+                <div class="endpoints" id="auth-endpoints"></div>
+            </div>
+            
+            <div class="test-section">
+                <div class="section-header">🎓 Student APIs</div>
+                <div class="endpoints" id="student-endpoints"></div>
+            </div>
+            
+            <div class="test-section">
+                <div class="section-header">📝 Registration APIs</div>
+                <div class="endpoints" id="registration-endpoints"></div>
+            </div>
+            
+            <div class="test-section">
+                <div class="section-header">🏫 Examination APIs</div>
+                <div class="endpoints" id="examination-endpoints"></div>
+            </div>
+            
+            <div class="test-section">
+                <div class="section-header">📊 Grading & Marking APIs</div>
+                <div class="endpoints" id="grading-endpoints"></div>
+            </div>
+            
+            <div class="test-section">
+                <div class="section-header">👑 Admin APIs</div>
+                <div class="endpoints" id="admin-endpoints"></div>
+            </div>
+            
+            <div class="summary" id="summary" style="display: none;">
+                <h3>📊 Test Results Summary</h3>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number" id="total-tests">0</div>
+                        <div class="stat-label">Total Tests</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="passed-tests" style="color: #28a745;">0</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="failed-tests" style="color: #dc3545;">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="success-rate" style="color: #ffc107;">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const endpoints = {
+            auth: [
+                { method: 'GET', path: '/api/auth/register', description: 'Get all users' },
+                { method: 'POST', path: '/api/auth/login', description: 'User login', data: { email: 'test@example.com', password: 'password123' } },
+                { method: 'POST', path: '/api/auth/logout', description: 'User logout' },
+                { method: 'POST', path: '/api/auth/refresh-token', description: 'Refresh token' },
+                { method: 'POST', path: '/api/auth/forgot-password', description: 'Forgot password' },
+                { method: 'GET', path: '/api/auth/verify-email?token=test', description: 'Verify email' }
+            ],
+            student: [
+                { method: 'GET', path: '/api/students', description: 'Get all students' },
+                { method: 'GET', path: '/api/students/GCE2025-ST-003421', description: 'Get student by ID' },
+                { method: 'GET', path: '/api/students/GCE2025-ST-003421/results', description: 'Get student results' },
+                { method: 'GET', path: '/api/students/GCE2025-ST-003421/exams', description: 'Get student exams' }
+            ],
+            registration: [
+                { method: 'GET', path: '/api/registration/subjects', description: 'Get all subjects' },
+                { method: 'GET', path: '/api/registration/subjects?level=O%20Level', description: 'Get O Level subjects' },
+                { method: 'GET', path: '/api/registration/schools', description: 'Get all schools' },
+                { method: 'GET', path: '/api/registration/students/search', description: 'Search students' }
+            ],
+            examination: [
+                { method: 'GET', path: '/api/examinations/centers', description: 'Get exam centers' },
+                { method: 'GET', path: '/api/examinations/schedule', description: 'Get exam schedules' },
+                { method: 'GET', path: '/api/examinations/materials', description: 'Get exam materials' },
+                { method: 'GET', path: '/api/examinations/attendance', description: 'Get attendance' }
+            ],
+            grading: [
+                { method: 'GET', path: '/api/grading/grade-boundaries', description: 'Get grade boundaries' },
+                { method: 'GET', path: '/api/marking/scores', description: 'Get marking scores' },
+                { method: 'GET', path: '/api/results/statistics', description: 'Get result statistics' }
+            ],
+            admin: [
+                { method: 'GET', path: '/api/admin/dashboard/stats', description: 'Get admin stats' },
+                { method: 'GET', path: '/api/admin/system-health', description: 'Get system health' },
+                { method: 'GET', path: '/api/analytics/performance/student', description: 'Get student analytics' }
+            ]
+        };
+
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+
+        function createEndpointElement(endpoint, category) {
+            const div = document.createElement('div');
+            div.className = 'endpoint';
+            div.innerHTML = `
+                <span class="method ${endpoint.method}">${endpoint.method}</span>
+                <span class="path">${endpoint.path}</span>
+                <button class="test-btn" onclick="testEndpoint('${endpoint.method}', '${endpoint.path}', '${category}', ${endpoint.data ? JSON.stringify(endpoint.data).replace(/"/g, '&quot;') : 'null'}, this)">
+                    Test
+                </button>
+                <span class="status" id="status-${category}-${endpoint.path.replace(/[^a-zA-Z0-9]/g, '-')}"></span>
+            `;
+            return div;
+        }
+
+        function renderEndpoints() {
+            Object.keys(endpoints).forEach(category => {
+                const container = document.getElementById(`${category}-endpoints`);
+                endpoints[category].forEach(endpoint => {
+                    container.appendChild(createEndpointElement(endpoint, category));
+                });
+            });
+        }
+
+        async function testEndpoint(method, path, category, data, button) {
+            const statusId = `status-${category}-${path.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            const statusElement = document.getElementById(statusId);
+            
+            button.disabled = true;
+            statusElement.className = 'status loading';
+            statusElement.textContent = 'Testing...';
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (data && method !== 'GET') {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(path, options);
+                
+                if (response.ok) {
+                    statusElement.className = 'status success';
+                    statusElement.textContent = `✅ ${response.status}`;
+                    passedTests++;
+                } else {
+                    statusElement.className = 'status error';
+                    statusElement.textContent = `❌ ${response.status}`;
+                    failedTests++;
+                }
+            } catch (error) {
+                statusElement.className = 'status error';
+                statusElement.textContent = `❌ Error`;
+                failedTests++;
+            }
+            
+            button.disabled = false;
+            totalTests++;
+            updateSummary();
+        }
+
+        async function testAllEndpoints() {
+            totalTests = 0;
+            passedTests = 0;
+            failedTests = 0;
+            
+            const allButtons = document.querySelectorAll('.test-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            for (const category of Object.keys(endpoints)) {
+                for (const endpoint of endpoints[category]) {
+                    const button = document.querySelector(`button[onclick*="${endpoint.path}"]`);
+                    await testEndpoint(endpoint.method, endpoint.path, category, endpoint.data || null, button);
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between requests
+                }
+            }
+            
+            allButtons.forEach(btn => btn.disabled = false);
+        }
+
+        function updateSummary() {
+            document.getElementById('summary').style.display = 'block';
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            
+            const successRate = totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0;
+            document.getElementById('success-rate').textContent = `${successRate}%`;
+        }
+
+        // Initialize the page
+        renderEndpoints();
+    </script>
+</body>
+</html>
