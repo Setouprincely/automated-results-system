@@ -87,6 +87,12 @@ export default function Login() {
           localStorage.setItem('userType', userData.userType);
           localStorage.setItem('userId', userData.id);
           localStorage.setItem('userName', userData.name);
+          localStorage.setItem('userEmail', userData.email);
+
+          // Store exam level for students
+          if (userData.examLevel) {
+            localStorage.setItem('examLevel', userData.examLevel);
+          }
         }
 
         // Redirect to appropriate dashboard based on user type

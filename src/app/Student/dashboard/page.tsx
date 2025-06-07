@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import StudentLayout from '@/components/layouts/StudentLayout';
 import { useStudentProfile, useStudentExams, useStudentResults } from '@/lib/hooks/useStudent';
+import { useUser } from '@/contexts/UserContext';
+import StudentUserInfo from '@/components/StudentUserInfo';
+import UserDataDisplay from '@/components/UserDataDisplay';
 import {
   Card,
   CardContent,
@@ -73,11 +75,41 @@ const Progress = ({ value, className }: { value: number, className?: string }) =
 const StudentDashboard = () => {
   const [language, setLanguage] = useState<'english' | 'french'>('english');
 
-  // Get student data from API
-  const studentId = getCurrentStudentId();
+  // Get user data from context (real-time)
+  const { user, loading: userLoading, error: userError, refreshUser } = useUser();
+
+  // Get additional student data from API hooks
+  const studentId = user?.id || getCurrentStudentId();
   const { data: studentInfo, loading: profileLoading, error: profileError } = useStudentProfile(studentId);
   const { data: examData, loading: examLoading, error: examError } = useStudentExams(studentId);
   const { data: resultsData, loading: resultsLoading, error: resultsError } = useStudentResults(studentId);
+
+  // Fallback function for backward compatibility
+  const getUserInfo = () => {
+    if (user) {
+      return {
+        userId: user.id,
+        userType: user.userType,
+        userName: user.fullName,
+        userEmail: user.email,
+        examLevel: user.examLevel
+      };
+    }
+
+    // Fallback to localStorage if context not available
+    if (typeof window !== 'undefined') {
+      return {
+        userId: localStorage.getItem('userId'),
+        userType: localStorage.getItem('userType'),
+        userName: localStorage.getItem('userName'),
+        userEmail: localStorage.getItem('userEmail'),
+        examLevel: localStorage.getItem('examLevel')
+      };
+    }
+    return {};
+  };
+
+  const userInfo = getUserInfo();
 
   // Translation function - In a real app, use a proper i18n library
   const t = (english: string, french: string) => {
@@ -90,13 +122,14 @@ const StudentDashboard = () => {
   };
 
   // Loading state
-  if (profileLoading || examLoading || resultsLoading) {
+  if (userLoading || profileLoading || examLoading || resultsLoading) {
     return (
       <StudentLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
             <p className="mt-4 text-gray-700">{t('Loading dashboard...', 'Chargement du tableau de bord...')}</p>
+            {userLoading && <p className="text-sm text-gray-500 mt-2">Loading user profile...</p>}
           </div>
         </div>
       </StudentLayout>
@@ -104,7 +137,7 @@ const StudentDashboard = () => {
   }
 
   // Error state
-  if (profileError || examError || resultsError) {
+  if (userError || profileError || examError || resultsError) {
     return (
       <StudentLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -116,24 +149,47 @@ const StudentDashboard = () => {
               {t('Error Loading Dashboard', 'Erreur de Chargement du Tableau de Bord')}
             </h2>
             <p className="text-gray-600">
-              {profileError || examError || resultsError}
+              {userError || profileError || examError || resultsError}
             </p>
+            {userError && (
+              <button
+                onClick={refreshUser}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Retry
+              </button>
+            )}
           </div>
         </div>
       </StudentLayout>
     );
   }
 
-  // Default values if no data
-  const student = (studentInfo as any) || {
-    id: 'GCE2025-ST-003421',
-    fullName: 'Student',
-    photoUrl: '/images/prince.jpg',
-    examLevel: 'Advanced Level (A Level)',
-    examCenter: 'Default Center',
-    registrationStatus: 'confirmed',
-    subjects: []
+  // Use real user data - no more mock data!
+  const student = {
+    // Use ONLY real user data from the database
+    id: user?.id || userInfo.userId || '',
+    fullName: user?.fullName || userInfo.userName || '',
+    email: user?.email || userInfo.userEmail || '',
+    profilePicturePath: user?.profilePicturePath, // Real profile picture path
+    examLevel: user?.examLevel || userInfo.examLevel || '',
+    examCenter: user?.examCenter || 'Not specified',
+    centerCode: user?.centerCode || user?.schoolCenterNumber || '',
+    schoolCenterNumber: user?.schoolCenterNumber || '',
+    candidateNumber: user?.candidateNumber || '',
+    region: user?.region || '',
+    phoneNumber: user?.phoneNumber || '',
+    registrationStatus: user?.registrationStatus || 'confirmed',
+    createdAt: user?.createdAt || new Date().toISOString(),
+    subjects: (studentInfo as any)?.subjects || []
   };
+
+  console.log(`📊 Dashboard student data:`, {
+    id: student.id,
+    fullName: student.fullName,
+    profilePicturePath: student.profilePicturePath,
+    examLevel: student.examLevel
+  });
 
   const upcomingExams = (examData as any)?.upcomingExams || [];
   const notifications = (examData as any)?.notifications || [];
@@ -156,38 +212,16 @@ const StudentDashboard = () => {
           </Button>
         </div>
 
-        {/* Student Profile Banner */}
-        <Card className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-6">
-              <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white">
-                <Image
-                  src={student.photoUrl}
-                  alt={student.fullName}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold">{student.fullName}</h2>
-                <p className="text-blue-100">{t('Candidate ID:', 'ID du Candidat:')} {student.id}</p>
-                <div className="flex gap-4 mt-2">
-                  <Badge className="bg-white text-blue-700">
-                    {student.examLevel}
-                  </Badge>
-                  <Badge className="bg-green-500">
-                    {t('Registration: ', 'Inscription: ')} {student.registrationStatus}
-                  </Badge>
-                </div>
-              </div>
-              <div>
-                <Button className="bg-white text-blue-700 hover:bg-blue-50">
-                  {t('Download ID Card', 'Télécharger Carte d\'identité')}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Real-time Student Profile Banner */}
+        <StudentUserInfo variant="banner" showDetails={true} />
+
+        {/* Complete Registration Data Display */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">
+            {t('Your Complete Registration Information', 'Vos Informations d\'Inscription Complètes')}
+          </h3>
+          <UserDataDisplay variant="summary" />
+        </div>
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue="overview">

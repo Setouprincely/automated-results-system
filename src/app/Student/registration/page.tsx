@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StudentLayout from '@/components/layouts/StudentLayout';
 import Image from 'next/image';
-import { CheckCircle, AlertTriangle, Download, Printer, Share2, Loader2, RefreshCw } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Download, Printer, Share2, Loader2, RefreshCw, User } from 'lucide-react';
 import { useStudentProfile } from '@/lib/hooks/useStudent';
+import ProfilePicture from '@/components/ProfilePicture';
 
 // Define types
 interface Subject {
@@ -19,7 +20,7 @@ interface RegistrationData {
   status: 'confirmed' | 'pending';
   studentId: string;
   fullName: string;
-  photoUrl: string;
+  photoUrl: string | null; // Allow null for no profile picture
   examLevel: string;
   examCenter: string;
   centerCode: string;
@@ -52,7 +53,7 @@ const RegistrationConfirmation = () => {
     status: (studentData as any).registrationStatus === 'confirmed' ? 'confirmed' : 'pending',
     studentId: (studentData as any).id || studentId,
     fullName: (studentData as any).fullName || 'Student',
-    photoUrl: (studentData as any).photoUrl || '/images/prince.jpg',
+    photoUrl: (studentData as any).profilePicturePath || null, // Use real profile picture path
     examLevel: (studentData as any).examLevel || 'Advanced Level (A Level)',
     examCenter: (studentData as any).examCenter || 'Default Center',
     centerCode: (studentData as any).centerCode || 'DC-001',
@@ -267,13 +268,19 @@ const RegistrationConfirmation = () => {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 {/* Student Photo and Basic Info */}
                 <div className="flex flex-col items-center p-4 border border-gray-200 rounded-lg md:col-span-1">
-                  <Image
-                    src={registrationData.photoUrl}
-                    alt="Student Photo"
-                    width={120}
-                    height={150}
-                    className="object-cover border-2 border-gray-300 rounded-lg"
-                  />
+                  {registrationData.photoUrl ? (
+                    <Image
+                      src={registrationData.photoUrl}
+                      alt="Student Photo"
+                      width={120}
+                      height={150}
+                      className="object-cover border-2 border-gray-300 rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-[120px] h-[150px] border-2 border-gray-300 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <User className="w-12 h-12 text-gray-400" />
+                    </div>
+                  )}
                   <h2 className="mt-4 text-xl font-semibold text-gray-800">{registrationData.fullName}</h2>
                   <div className="w-full mt-4">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100">

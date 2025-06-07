@@ -3,6 +3,7 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, User, Mail, Lock, School, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
+import PictureUpload from '@/components/PictureUpload';
 
 export default function Register() {
   const router = useRouter();
@@ -21,6 +22,22 @@ export default function Register() {
     dateOfBirth: string;
     candidateNumber: string;
     userType: 'student' | 'teacher' | 'examiner';
+    // Enhanced student fields
+    examLevel: 'O Level' | 'A Level' | '';
+    gender: 'Male' | 'Female' | '';
+    phoneNumber: string;
+    region: string;
+    parentGuardianName: string;
+    parentGuardianPhone: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    previousSchool: string;
+    securityQuestion: string;
+    securityAnswer: string;
+    // Picture upload for all account types
+    profilePicture: File | null;
+    // School center number for students
+    schoolCenterNumber: string;
   }
 
   interface FormErrors {
@@ -32,6 +49,20 @@ export default function Register() {
     dateOfBirth?: string;
     candidateNumber?: string;
     form?: string;
+    // Enhanced student fields
+    examLevel?: string;
+    gender?: string;
+    phoneNumber?: string;
+    region?: string;
+    parentGuardianName?: string;
+    parentGuardianPhone?: string;
+    emergencyContactName?: string;
+    emergencyContactPhone?: string;
+    previousSchool?: string;
+    securityQuestion?: string;
+    securityAnswer?: string;
+    profilePicture?: string;
+    schoolCenterNumber?: string;
   }
 
   const [formData, setFormData] = useState<FormData>({
@@ -43,6 +74,22 @@ export default function Register() {
     dateOfBirth: '',
     candidateNumber: '',
     userType: 'student',
+    // Enhanced student fields
+    examLevel: '',
+    gender: '',
+    phoneNumber: '',
+    region: '',
+    parentGuardianName: '',
+    parentGuardianPhone: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    previousSchool: '',
+    securityQuestion: '',
+    securityAnswer: '',
+    // Picture upload for all account types
+    profilePicture: null,
+    // School center number for students
+    schoolCenterNumber: '',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -76,6 +123,27 @@ export default function Register() {
     processing: string;
     registrationSuccess: string;
     redirecting: string;
+    // Enhanced student fields
+    examLevel: string;
+    examLevelRequired: string;
+    oLevel: string;
+    aLevel: string;
+    gender: string;
+    phoneNumber: string;
+    region: string;
+    parentGuardianName: string;
+    parentGuardianPhone: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    previousSchool: string;
+    securityQuestion: string;
+    securityAnswer: string;
+    chooseExamLevel: string;
+    contactInformation: string;
+    guardianInformation: string;
+    emergencyContact: string;
+    educationalBackground: string;
+    securityInformation: string;
   }
 
   const translations: Record<'en' | 'fr', Translation> = {
@@ -108,6 +176,27 @@ export default function Register() {
       processing: 'Creating Account...',
       registrationSuccess: 'Registration successful! Welcome to our platform.',
       redirecting: 'Redirecting to your dashboard...',
+      // Enhanced student fields
+      examLevel: 'Examination Level',
+      examLevelRequired: 'You must choose between O Level or A Level',
+      oLevel: 'GCE O Level (Ordinary Level)',
+      aLevel: 'GCE A Level (Advanced Level)',
+      gender: 'Gender',
+      phoneNumber: 'Phone Number',
+      region: 'Region',
+      parentGuardianName: 'Parent/Guardian Name',
+      parentGuardianPhone: 'Parent/Guardian Phone',
+      emergencyContactName: 'Emergency Contact Name',
+      emergencyContactPhone: 'Emergency Contact Phone',
+      previousSchool: 'Previous School',
+      securityQuestion: 'Security Question',
+      securityAnswer: 'Security Answer',
+      chooseExamLevel: 'Choose Your GCE Examination Level',
+      contactInformation: 'Contact Information',
+      guardianInformation: 'Parent/Guardian Information',
+      emergencyContact: 'Emergency Contact',
+      educationalBackground: 'Educational Background',
+      securityInformation: 'Security Information',
     },
     fr: {
       title: 'Créer Votre Compte',
@@ -138,12 +227,33 @@ export default function Register() {
       processing: 'Création du Compte...',
       registrationSuccess: 'Inscription réussie! Bienvenue sur notre plateforme.',
       redirecting: 'Redirection vers votre tableau de bord...',
+      // Enhanced student fields
+      examLevel: 'Niveau d\'Examen',
+      examLevelRequired: 'Vous devez choisir entre O Level ou A Level',
+      oLevel: 'GCE O Level (Niveau Ordinaire)',
+      aLevel: 'GCE A Level (Niveau Avancé)',
+      gender: 'Sexe',
+      phoneNumber: 'Numéro de Téléphone',
+      region: 'Région',
+      parentGuardianName: 'Nom du Parent/Tuteur',
+      parentGuardianPhone: 'Téléphone du Parent/Tuteur',
+      emergencyContactName: 'Nom du Contact d\'Urgence',
+      emergencyContactPhone: 'Téléphone du Contact d\'Urgence',
+      previousSchool: 'École Précédente',
+      securityQuestion: 'Question de Sécurité',
+      securityAnswer: 'Réponse de Sécurité',
+      chooseExamLevel: 'Choisissez Votre Niveau d\'Examen GCE',
+      contactInformation: 'Informations de Contact',
+      guardianInformation: 'Informations du Parent/Tuteur',
+      emergencyContact: 'Contact d\'Urgence',
+      educationalBackground: 'Antécédents Éducatifs',
+      securityInformation: 'Informations de Sécurité',
     }
   };
 
   const t = translations[language];
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -185,9 +295,14 @@ export default function Register() {
       newErrors.confirmPassword = t.passwordMismatch;
     }
 
-    // Student-specific validations
+    // Student-specific validations (only validate fields that are actually on the form)
     if (userType === 'student') {
+      if (!formData.examLevel) newErrors.examLevel = 'You must choose between O Level or A Level';
       if (!formData.dateOfBirth) newErrors.dateOfBirth = t.requiredField;
+      if (!formData.gender) newErrors.gender = 'Gender is required';
+      if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+      if (!formData.region) newErrors.region = 'Region is required';
+      if (!formData.schoolCenterNumber) newErrors.schoolCenterNumber = 'School center number is required';
       if (!formData.candidateNumber) newErrors.candidateNumber = t.requiredField;
     }
 
@@ -209,11 +324,36 @@ export default function Register() {
       userType
     }));
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      // Show validation errors to user
+      const errorMessages = Object.values(errors).filter(Boolean);
+      if (errorMessages.length > 0) {
+        alert('Please fix the following errors:\n' + errorMessages.join('\n'));
+      }
+      return;
+    }
 
     setLoading(true);
 
     try {
+      // Convert profile picture to base64 if present
+      let profilePictureData = null;
+      if (formData.profilePicture) {
+        try {
+          const reader = new FileReader();
+          profilePictureData = await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(formData.profilePicture!);
+          });
+        } catch (error) {
+          console.error('Error reading profile picture:', error);
+          setErrors({ form: 'Failed to process profile picture' });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Call real registration API
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -222,7 +362,8 @@ export default function Register() {
         },
         body: JSON.stringify({
           ...formData,
-          userType
+          userType,
+          profilePictureData // Include base64 image data
         }),
       });
 
@@ -233,12 +374,42 @@ export default function Register() {
         return;
       }
 
+      // If profile picture was uploaded, upload it separately
+      if (profilePictureData && result.data.id) {
+        try {
+          const uploadResponse = await fetch('/api/upload/profile-picture', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: result.data.id,
+              userType: result.data.userType,
+              examLevel: formData.examLevel,
+              imageData: profilePictureData,
+              fileName: formData.profilePicture?.name || 'profile.jpg'
+            }),
+          });
+
+          if (!uploadResponse.ok) {
+            console.warn('Profile picture upload failed, but registration succeeded');
+          }
+        } catch (uploadError) {
+          console.error('Error uploading profile picture:', uploadError);
+          // Don't fail registration if picture upload fails
+        }
+      }
+
       // Store authentication data
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', result.data.token);
         localStorage.setItem('userType', result.data.userType);
         localStorage.setItem('userId', result.data.id);
         localStorage.setItem('userName', result.data.name);
+        localStorage.setItem('userEmail', result.data.email || formData.email);
+        if (formData.examLevel) {
+          localStorage.setItem('examLevel', formData.examLevel);
+        }
       }
 
       // Show success message
@@ -570,6 +741,26 @@ export default function Register() {
                   </div>
                 </div>
 
+                {/* Profile Picture Section */}
+                <div>
+                  <div className="flex items-center mb-6">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-blue-600 font-semibold text-sm">3</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">Profile Picture</h3>
+                  </div>
+
+                  <div className="max-w-md mx-auto">
+                    <PictureUpload
+                      onImageSelect={(file) => setFormData(prev => ({ ...prev, profilePicture: file }))}
+                      currentImage={formData.profilePicture}
+                      label="Profile Picture"
+                      required={userType === 'student'}
+                      userType={userType}
+                    />
+                  </div>
+                </div>
+
                 {/* Additional Information Section */}
                 {(userType === 'student' || userType === 'teacher') && (
                   <div>
@@ -584,6 +775,46 @@ export default function Register() {
                       {/* Student-specific fields */}
                       {userType === 'student' && (
                         <>
+                          {/* EXAM LEVEL SELECTION - MOST IMPORTANT */}
+                          <div className="sm:col-span-2 mb-6">
+                            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                              <label className="block text-lg font-bold text-blue-900 mb-4">
+                                🎓 Choose Your GCE Examination Level *
+                              </label>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {[
+                                  { value: 'O Level', label: 'GCE O Level (Ordinary Level)', description: 'For students completing secondary education' },
+                                  { value: 'A Level', label: 'GCE A Level (Advanced Level)', description: 'For students seeking university admission' }
+                                ].map((level) => (
+                                  <button
+                                    key={level.value}
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, examLevel: level.value as 'O Level' | 'A Level' }))}
+                                    className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                                      formData.examLevel === level.value
+                                        ? 'border-blue-500 bg-blue-100 shadow-md'
+                                        : 'border-gray-200 bg-white hover:border-blue-300'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h4 className="font-bold text-gray-900">{level.label}</h4>
+                                      {formData.examLevel === level.value && (
+                                        <CheckCircle className="w-5 h-5 text-blue-600" />
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-gray-600">{level.description}</p>
+                                  </button>
+                                ))}
+                              </div>
+                              {!formData.examLevel && (
+                                <div className="mt-3 flex items-center text-red-600">
+                                  <AlertCircle className="w-4 h-4 mr-2" />
+                                  <span className="text-sm font-medium">You must choose between O Level or A Level</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
                           <div>
                             <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-gray-700 mb-2">
                               {t.dateOfBirth} *
@@ -609,6 +840,84 @@ export default function Register() {
                               <div className="mt-2 flex items-center text-sm text-red-600">
                                 <AlertCircle className="w-4 h-4 mr-1" />
                                 {errors.dateOfBirth}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Gender Selection */}
+                          <div>
+                            <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-2">
+                              Gender *
+                            </label>
+                            <select
+                              id="gender"
+                              name="gender"
+                              value={formData.gender}
+                              onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as 'Male' | 'Female' }))}
+                              className="block w-full px-4 py-4 border-2 rounded-xl text-gray-900 transition-all duration-200 border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-opacity-20"
+                            >
+                              <option value="">Select Gender</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                            </select>
+                          </div>
+
+                          {/* Phone Number */}
+                          <div>
+                            <label htmlFor="phoneNumber" className="block text-sm font-semibold text-gray-700 mb-2">
+                              Phone Number *
+                            </label>
+                            <input
+                              id="phoneNumber"
+                              name="phoneNumber"
+                              type="tel"
+                              value={formData.phoneNumber}
+                              onChange={handleInputChange}
+                              className="block w-full px-4 py-4 border-2 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-200 border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-opacity-20"
+                              placeholder="e.g., +237 6XX XXX XXX"
+                            />
+                          </div>
+
+                          {/* Region Selection */}
+                          <div>
+                            <label htmlFor="region" className="block text-sm font-semibold text-gray-700 mb-2">
+                              Region *
+                            </label>
+                            <select
+                              id="region"
+                              name="region"
+                              value={formData.region}
+                              onChange={handleInputChange}
+                              className="block w-full px-4 py-4 border-2 rounded-xl text-gray-900 transition-all duration-200 border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-opacity-20"
+                            >
+                              <option value="">Select Region</option>
+                              {['Adamawa', 'Centre', 'East', 'Far North', 'Littoral', 'North', 'Northwest', 'South', 'Southwest', 'West'].map(region => (
+                                <option key={region} value={region}>{region}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* School Center Number */}
+                          <div>
+                            <label htmlFor="schoolCenterNumber" className="block text-sm font-semibold text-gray-700 mb-2">
+                              School Center Number *
+                            </label>
+                            <input
+                              id="schoolCenterNumber"
+                              name="schoolCenterNumber"
+                              type="text"
+                              value={formData.schoolCenterNumber}
+                              onChange={handleInputChange}
+                              className="block w-full px-4 py-4 border-2 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-200 border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-opacity-20"
+                              placeholder="e.g., 001, 002, 003"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">
+                              Enter your school's center number (provided by your school)
+                            </p>
+                            {errors.schoolCenterNumber && (
+                              <div className="mt-2 flex items-center text-sm text-red-600">
+                                <AlertCircle className="w-4 h-4 mr-1" />
+                                {errors.schoolCenterNumber}
                               </div>
                             )}
                           </div>

@@ -12,7 +12,7 @@ export default function Home() {
 
   const translations = {
     en: {
-      welcome: "Welcome to Cameroon GCE Examination System",
+      welcome: "Welcome to Cameroon GCE Board official Examination platform",
       subtitle: "A comprehensive platform for GCE examination management",
       login: "Login",
       register: "Register",

@@ -29,7 +29,7 @@ const verifyPassword = async (password: string, hash: string): Promise<boolean> 
 // Generate unique ID for each user type
 const generateUserId = (userType: User['userType']): string => {
   const timestamp = Date.now().toString().slice(-6);
-  
+
   switch (userType) {
     case 'student':
       return `GCE2025-ST-${timestamp}`;
@@ -71,10 +71,10 @@ export const postgresDb = {
   // Create a new user in the appropriate schema
   createUser: async (userData: Omit<User, 'id' | 'createdAt' | 'passwordHash'> & { password: string }): Promise<User> => {
     const { password, userType, ...userInfo } = userData;
-    
+
     const userId = generateUserId(userType);
     const passwordHash = await hashPassword(password);
-    
+
     const commonData = {
       id: userId,
       fullName: userInfo.fullName,
@@ -164,10 +164,9 @@ export const postgresDb = {
 
       switch (userType) {
         case 'student':
-          user = await prisma.studentUser.findUnique({
-            where: { email: email.toLowerCase() }
-          });
-          break;
+          // For students, we need to check both O Level and A Level databases
+          // This is handled by SeparateStudentDatabase, so we'll skip this case
+          return null;
         case 'teacher':
           user = await prisma.teacherUser.findUnique({
             where: { email: email.toLowerCase() }

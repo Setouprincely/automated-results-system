@@ -14,9 +14,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Download, Printer, Share2, Award, BarChart3, AlertCircle } from "lucide-react";
+import { Download, Printer, Share2, Award, BarChart3, AlertCircle, User } from "lucide-react";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/UserContext';
+import ProfilePicture from '@/components/ProfilePicture';
 
 // Get current student ID from localStorage or use default
 const getCurrentStudentId = () => {
@@ -31,6 +33,9 @@ export default function StudentResults() {
   const [resultsVerified] = useState(true); // Removed unused setter
   const [language, setLanguage] = useState<'en' | 'fr'>('en'); // 'en' for English, 'fr' for French
 
+  // Get real user data from context
+  const { user } = useUser();
+
   // Get student data from API
   const studentId = getCurrentStudentId();
   const { data: studentProfile, loading: profileLoading, error: profileError } = useStudentProfile(studentId);
@@ -40,22 +45,28 @@ export default function StudentResults() {
   const loading = profileLoading || resultsLoading;
   const error = profileError || resultsError;
 
-  // Transform API data to match our interface
-  const studentInfo = studentProfile ? {
-    name: (studentProfile as any).fullName || "Student",
-    candidateNumber: (studentProfile as any).id || studentId,
-    center: (studentProfile as any).examCenter || "Default Center",
+  // Use real user data from context first, then API data as fallback
+  const studentInfo = {
+    name: user?.fullName || (studentProfile as any)?.fullName || "Student",
+    candidateNumber: user?.candidateNumber || (studentProfile as any)?.id || studentId,
+    center: user?.examCenter || (studentProfile as any)?.examCenter || "Default Center",
     examSession: "June 2025",
-    level: (studentProfile as any).examLevel || "Advanced Level",
-    photo: (studentProfile as any).photoUrl || "/images/prince.jpg"
-  } : {
-    name: "Student",
-    candidateNumber: studentId,
-    center: "Default Center",
-    examSession: "June 2025",
-    level: "Advanced Level",
-    photo: "/images/prince.jpg"
+    level: user?.examLevel || (studentProfile as any)?.examLevel || "Advanced Level",
+    photo: user?.profilePicturePath || (studentProfile as any)?.profilePicturePath || null,
+    schoolCenterNumber: user?.schoolCenterNumber || (studentProfile as any)?.schoolCenterNumber,
+    region: user?.region || (studentProfile as any)?.region,
+    // Get subjects from user data (stored as JSON in database)
+    subjects: user?.examLevel === 'O Level'
+      ? (user as any)?.oLevelSubjects || []
+      : (user as any)?.aLevelSubjects || []
   };
+
+  console.log(`📊 Results page student info:`, {
+    name: studentInfo.name,
+    level: studentInfo.level,
+    subjects: studentInfo.subjects,
+    profilePicture: studentInfo.photo
+  });
 
   // Default results data with API fallback
   const resultsData = (resultsResponse as any) || {
@@ -248,15 +259,21 @@ export default function StudentResults() {
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-shrink-0">
-                <div className="rounded-md overflow-hidden border border-gray-200">
-                  <Image
-                    src={studentInfo.photo}
-                    alt={studentInfo.name}
-                    width={120}
-                    height={120}
-                    className="object-cover"
-                  />
-                </div>
+                {studentInfo.photo ? (
+                  <div className="rounded-md overflow-hidden border border-gray-200">
+                    <Image
+                      src={studentInfo.photo}
+                      alt={studentInfo.name}
+                      width={120}
+                      height={120}
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-[120px] h-[120px] rounded-md border border-gray-200 bg-gray-100 flex items-center justify-center">
+                    <User className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
                 <div>
@@ -309,7 +326,7 @@ export default function StudentResults() {
                         </tr>
                       </thead>
                       <tbody>
-                        {resultsData.oLevel.subjects.map((subject, index) => (
+                        {resultsData.oLevel.subjects.map((subject: any, index: number) => (
                           <tr key={index} className="border-b hover:bg-gray-50">
                             <td className="px-6 py-4">{subject.name}</td>
                             <td className="px-6 py-4">
@@ -369,7 +386,7 @@ export default function StudentResults() {
                         </tr>
                       </thead>
                       <tbody>
-                        {resultsData.aLevel.subjects.map((subject, index) => (
+                        {resultsData.aLevel.subjects.map((subject: any, index: number) => (
                           <tr key={index} className="border-b hover:bg-gray-50">
                             <td className="px-6 py-4">{subject.name}</td>
                             <td className="px-6 py-4">

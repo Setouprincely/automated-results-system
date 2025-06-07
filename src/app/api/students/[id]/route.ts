@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import SeparateStudentDatabase from '@/lib/separateStudentDb';
 import { userStorage } from '@/lib/userStorage';
 
-// Mock student data (fallback)
+// Mock student data (fallback for demo)
 const mockStudents = {
-  'GCE2025-ST-003421': {
-    id: 'GCE2025-ST-003421',
-    fullName: 'Jean-Michel Fopa',
+  'demo-student': {
+    id: 'demo-student',
+    fullName: 'Demo Student',
+    email: 'demo@student.com',
     photoUrl: '/images/prince.jpg',
-    examLevel: 'Advanced Level (A Level)',
-    examCenter: 'GBHS Limbe',
-    centerCode: 'GBHS-001',
+    examLevel: 'A Level',
+    examCenter: 'Demo Center',
+    centerCode: 'DEMO-001',
     registrationStatus: 'confirmed',
     createdAt: '2025-01-15T00:00:00Z',
+    userType: 'student',
     subjects: [
       { code: 'ALG', name: 'English Literature', status: 'confirmed' },
       { code: 'AFR', name: 'French', status: 'confirmed' },
@@ -19,17 +22,6 @@ const mockStudents = {
       { code: 'APY', name: 'Physics', status: 'confirmed' },
       { code: 'ACY', name: 'Chemistry', status: 'confirmed' }
     ]
-  },
-  'admin': {
-    id: 'admin',
-    fullName: 'Administrator',
-    photoUrl: '/images/prince.jpg',
-    examLevel: 'N/A',
-    examCenter: 'Admin Center',
-    centerCode: 'ADM-001',
-    registrationStatus: 'confirmed',
-    createdAt: '2025-01-01T00:00:00Z',
-    subjects: []
   }
 };
 
@@ -39,43 +31,96 @@ export async function GET(
 ) {
   try {
     const { id } = params;
+    const { searchParams } = new URL(request.url);
+    const examLevel = searchParams.get('examLevel') as 'O Level' | 'A Level' | null;
 
-    // Find student by ID in student database first
-    let student = await userStorage.findById(id);
+    console.log(`🔍 Fetching student data for ID: ${id}, examLevel: ${examLevel}`);
 
-    // If not found in registered users, check mock data
-    if (!student) {
-      student = mockStudents[id as keyof typeof mockStudents];
+    let student = null;
+    let studentExamLevel: 'O Level' | 'A Level' | null = null;
+
+    // First try the separate student database
+    if (examLevel) {
+      // Search specific exam level database
+      student = await SeparateStudentDatabase.findStudentById(id, examLevel);
+      studentExamLevel = examLevel;
+      console.log(`📚 Found in ${examLevel} database:`, !!student);
+    } else {
+      // Search both databases
+      try {
+        student = await SeparateStudentDatabase.findStudentById(id, 'O Level');
+        if (student) {
+          studentExamLevel = 'O Level';
+          console.log('📚 Found in O Level database');
+        } else {
+          student = await SeparateStudentDatabase.findStudentById(id, 'A Level');
+          if (student) {
+            studentExamLevel = 'A Level';
+            console.log('📚 Found in A Level database');
+          }
+        }
+      } catch (error) {
+        console.log('⚠️ Error searching separate databases:', error);
+      }
     }
 
-    // If still not found, try to find a default student for demo purposes
+    // Fallback to old user storage system
     if (!student) {
-      // Get all students from student database
-      const allStudents = await userStorage.getUsersByType('student');
-      if (allStudents.length > 0) {
-        // Return the first student as a fallback for demo
-        student = allStudents[0];
-        console.log(`Student ${id} not found, returning demo student:`, student.id);
+      console.log('🔄 Trying old user storage system...');
+      student = await userStorage.findById(id);
+      if (student && (student as any).examLevel) {
+        studentExamLevel = (student as any).examLevel;
+      }
+    }
+
+    // Fallback to mock data for demo
+    if (!student) {
+      console.log('🎭 Using mock data for demo...');
+      student = mockStudents[id as keyof typeof mockStudents];
+      if (student) {
+        studentExamLevel = (student as any).examLevel;
       }
     }
 
     if (!student) {
+      console.log('❌ Student not found anywhere');
       return NextResponse.json(
         { success: false, message: 'Student not found' },
         { status: 404 }
       );
     }
 
-    // Remove password hash from response
-    const { passwordHash, ...safeStudent } = student as any;
+    // Remove sensitive information
+    const { passwordHash, securityAnswerHash, ...safeStudent } = student as any;
+
+    // Ensure we have the required fields
+    const responseData = {
+      ...safeStudent,
+      examLevel: studentExamLevel || safeStudent.examLevel,
+      userType: 'student',
+      profilePicturePath: safeStudent.profilePicturePath || safeStudent.photoUrl
+    };
+
+    console.log('✅ Returning student data:', {
+      id: responseData.id,
+      fullName: responseData.fullName,
+      examLevel: responseData.examLevel,
+      profilePicturePath: responseData.profilePicturePath
+    });
+
+    console.log(`📸 Profile picture debug for ${responseData.fullName}:`, {
+      profilePicturePath: responseData.profilePicturePath,
+      photoUrl: safeStudent.photoUrl,
+      hasProfilePicture: !!responseData.profilePicturePath
+    });
 
     return NextResponse.json({
       success: true,
-      data: safeStudent,
+      data: responseData,
       message: 'Student profile retrieved successfully'
     });
   } catch (error) {
-    console.error('Error fetching student:', error);
+    console.error('❌ Error fetching student:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

@@ -10,11 +10,11 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["student_auth", "teacher_auth", "examiner_auth", "admin_auth", "public"]
+  schemas  = ["o_level_students", "a_level_students", "teacher_auth", "examiner_auth", "public"]
 }
 
-// Student users in separate schema for complete isolation
-model StudentUser {
+// O Level Students - Separate database for complete isolation
+model OLevelStudent {
   id                 String   @id @default(cuid())
   fullName          String
   email             String   @unique
@@ -22,13 +22,63 @@ model StudentUser {
   registrationStatus String  @default("pending") // pending, confirmed, suspended
   emailVerified     Boolean  @default(false)
 
-  // Student-specific fields
-  examLevel         String?  // "O Level" or "A Level"
-  examCenter        String?
-  centerCode        String?
-  candidateNumber   String?
-  dateOfBirth       String?
-  subjects          Json?    // Array of subjects as JSON
+  // Personal Details (Enhanced Security)
+  dateOfBirth       String
+  gender            String   // "Male" or "Female"
+  nationalIdNumber  String?
+  placeOfBirth      String?
+
+  // Contact Information
+  phoneNumber       String
+  region            String   // Cameroon region
+  division          String?
+  currentAddress    String?
+
+  // Guardian Information (Required for minors)
+  parentGuardianName String
+  parentGuardianPhone String
+  parentGuardianRelation String?
+
+  // Emergency Contact
+  emergencyContactName String
+  emergencyContactPhone String
+  emergencyContactRelation String?
+
+  // Educational Background
+  previousSchool    String
+  previousSchoolRegion String?
+  yearOfCompletion  String?
+
+  // O Level Specific Examination Details
+  candidateNumber   String
+  examCenter        String
+  centerCode        String   // School center number (REQUIRED)
+  examSession       String   @default("2025")
+  oLevelSubjects    Json?    // O Level specific subjects
+
+  // School Relationship
+  schoolCenterNumber String  // Links to school's center number
+  schoolName        String?  // School name for reference
+
+  // Security Information
+  securityQuestion  String
+  securityAnswerHash String  // Hashed security answer
+
+  // Document References (file paths/URLs)
+  profilePicturePath String?  // Profile picture upload (optional)
+  photoUploadPath   String?   // Passport photo for verification
+  birthCertificatePath String?
+  nationalIdCopyPath String?
+  previousResultsPath String?
+
+  // Verification Status
+  documentsVerified Boolean  @default(false)
+  parentalConsentGiven Boolean @default(false)
+  identityVerified  Boolean  @default(false)
+
+  // O Level Specific Fields
+  previousOLevelAttempts Int? @default(0)
+  isRepeatingCandidate Boolean @default(false)
 
   // Timestamps
   createdAt         DateTime @default(now())
@@ -36,7 +86,84 @@ model StudentUser {
   updatedAt         DateTime @updatedAt
 
   @@map("users")
-  @@schema("student_auth")
+  @@schema("o_level_students")
+}
+
+// A Level Students - Separate database for complete isolation
+model ALevelStudent {
+  id                 String   @id @default(cuid())
+  fullName          String
+  email             String   @unique
+  passwordHash      String
+  registrationStatus String  @default("pending") // pending, confirmed, suspended
+  emailVerified     Boolean  @default(false)
+
+  // Personal Details (Enhanced Security)
+  dateOfBirth       String
+  gender            String   // "Male" or "Female"
+  nationalIdNumber  String?
+  placeOfBirth      String?
+
+  // Contact Information
+  phoneNumber       String
+  region            String   // Cameroon region
+  division          String?
+  currentAddress    String?
+
+  // Guardian Information (Required for minors)
+  parentGuardianName String
+  parentGuardianPhone String
+  parentGuardianRelation String?
+
+  // Emergency Contact
+  emergencyContactName String
+  emergencyContactPhone String
+  emergencyContactRelation String?
+
+  // Educational Background
+  previousSchool    String
+  previousSchoolRegion String?
+  yearOfCompletion  String?
+
+  // A Level Specific Examination Details
+  candidateNumber   String
+  examCenter        String
+  centerCode        String   // School center number (REQUIRED)
+  examSession       String   @default("2025")
+  aLevelSubjects    Json?    // A Level specific subjects
+
+  // School Relationship
+  schoolCenterNumber String  // Links to school's center number
+  schoolName        String?  // School name for reference
+
+  // Security Information
+  securityQuestion  String
+  securityAnswerHash String  // Hashed security answer
+
+  // Document References (file paths/URLs)
+  profilePicturePath String?  // Profile picture upload (optional)
+  photoUploadPath   String?   // Passport photo for verification
+  birthCertificatePath String?
+  nationalIdCopyPath String?
+  previousResultsPath String?
+
+  // Verification Status
+  documentsVerified Boolean  @default(false)
+  parentalConsentGiven Boolean @default(false)
+  identityVerified  Boolean  @default(false)
+
+  // A Level Specific Fields
+  oLevelResults     Json?    // Previous O Level results (required for A Level)
+  universityChoices Json?    // University application choices
+  careerPath        String?  // Intended career path
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  lastLogin         DateTime?
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+  @@schema("a_level_students")
 }
 
 // Teacher users in separate schema
@@ -50,8 +177,12 @@ model TeacherUser {
 
   // Teacher-specific fields
   school            String?
+  centerNumber      String?  // School center number
   teachingSubjects  Json?    // Array of subjects they teach
   qualifications    Json?    // Teaching qualifications
+
+  // Profile Picture
+  profilePicturePath String? // Optional profile picture
 
   // Timestamps
   createdAt         DateTime @default(now())
@@ -76,6 +207,9 @@ model ExaminerUser {
   examiningLevel    String?  // O Level, A Level, or both
   certifications    Json?    // Examining certifications
 
+  // Profile Picture
+  profilePicturePath String? // Optional profile picture
+
   // Timestamps
   createdAt         DateTime @default(now())
   lastLogin         DateTime?
@@ -85,28 +219,9 @@ model ExaminerUser {
   @@schema("examiner_auth")
 }
 
-// Admin users in separate schema
-model AdminUser {
-  id                 String   @id @default(cuid())
-  fullName          String
-  email             String   @unique
-  passwordHash      String
-  registrationStatus String  @default("pending")
-  emailVerified     Boolean  @default(false)
-
-  // Admin-specific fields
-  role              String?  // super_admin, regional_admin, center_admin
-  permissions       Json?    // Array of permissions
-  region            String?  // Assigned region
-
-  // Timestamps
-  createdAt         DateTime @default(now())
-  lastLogin         DateTime?
-  updatedAt         DateTime @updatedAt
-
-  @@map("users")
-  @@schema("admin_auth")
-}
+// Admin authentication is handled by SecureAdminAuth system
+// No admin accounts stored in database for security reasons
+// Admin access uses time-based authentication with TOTP
 
 // Shared data in public schema (accessible by all user types)
 model Subject {
@@ -136,6 +251,40 @@ model ExamCenter {
   updatedAt   DateTime @updatedAt
 
   @@map("exam_centers")
+  @@schema("public")
+}
+
+// School management for student-school relationships
+model School {
+  id            String   @id @default(cuid())
+  centerNumber  String   @unique // School center number (e.g., "001", "002")
+  name          String   // School name
+  fullName      String?  // Full official name
+  region        String   // Cameroon region
+  division      String?  // Division within region
+  address       String?  // Physical address
+  phoneNumber   String?  // Contact phone
+  email         String?  // Contact email
+  principalName String?  // Principal's name
+
+  // School Type
+  schoolType    String   // "Government", "Private", "Mission", etc.
+  level         String   // "Secondary", "High School", "Both"
+
+  // Capacity and Status
+  studentCapacity Int?   // Maximum students
+  isActive      Boolean  @default(true)
+
+  // Registration counts (updated automatically)
+  totalStudents Int      @default(0)
+  oLevelStudents Int     @default(0)
+  aLevelStudents Int     @default(0)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("schools")
   @@schema("public")
 }
 

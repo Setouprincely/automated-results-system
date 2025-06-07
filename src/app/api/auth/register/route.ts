@@ -11,7 +11,22 @@ export async function POST(request: NextRequest) {
       userType,
       school,
       dateOfBirth,
-      candidateNumber
+      candidateNumber,
+      // Enhanced student fields
+      examLevel,
+      gender,
+      phoneNumber,
+      region,
+      schoolCenterNumber,
+      parentGuardianName,
+      parentGuardianPhone,
+      emergencyContactName,
+      emergencyContactPhone,
+      previousSchool,
+      securityQuestion,
+      securityAnswer,
+      // Picture upload (will be handled separately)
+      profilePicture
     } = body;
 
     // Validate required fields
@@ -50,15 +65,58 @@ export async function POST(request: NextRequest) {
       candidateNumber: candidateNumber || undefined,
       registrationStatus: 'confirmed',
       emailVerified: false, // Require email verification
-      examLevel: userType === 'student' ? 'Advanced Level (A Level)' : undefined,
+      // Enhanced student fields
+      examLevel: examLevel || (userType === 'student' ? 'O Level' : undefined),
+      gender: gender || undefined,
+      phoneNumber: phoneNumber || undefined,
+      region: region || undefined,
+      schoolCenterNumber: schoolCenterNumber || undefined,
+      parentGuardianName: parentGuardianName || undefined,
+      parentGuardianPhone: parentGuardianPhone || undefined,
+      emergencyContactName: emergencyContactName || undefined,
+      emergencyContactPhone: emergencyContactPhone || undefined,
+      previousSchool: previousSchool || undefined,
+      securityQuestion: securityQuestion || undefined,
+      securityAnswer: securityAnswer || undefined,
       examCenter: userType === 'student' ? 'Default Examination Center' : undefined,
-      centerCode: userType === 'student' ? 'DEC-001' : undefined,
+      centerCode: schoolCenterNumber || (userType === 'student' ? 'DEC-001' : undefined),
       subjects: userType === 'student' ? [
         { code: 'ALG', name: 'English Literature', status: 'confirmed' },
         { code: 'AFR', name: 'French', status: 'confirmed' },
         { code: 'AMH', name: 'Mathematics', status: 'confirmed' }
       ] : undefined
     });
+
+    // If student, register them to their school
+    if (userType === 'student' && schoolCenterNumber && examLevel) {
+      try {
+        // Call the school-student relationship API
+        const schoolRegistrationResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/schools/students`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentId: newUser.id,
+            schoolCenterNumber,
+            examLevel,
+            studentData: {
+              fullName: newUser.fullName,
+              email: newUser.email
+            }
+          })
+        });
+
+        if (schoolRegistrationResponse.ok) {
+          console.log('Student successfully registered to school:', schoolCenterNumber);
+        } else {
+          console.warn('Failed to register student to school, but user creation succeeded');
+        }
+      } catch (error) {
+        console.error('Error registering student to school:', error);
+        // Don't fail the entire registration if school registration fails
+      }
+    }
 
     // Email verification would be sent here in production
     // For now, we'll skip the internal API call to avoid circular dependencies

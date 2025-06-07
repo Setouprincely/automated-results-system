@@ -1,0 +1,320 @@
+<!-- Moving to public folder -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .exam-level {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .exam-level button {
+            flex: 1;
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        .exam-level button.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>🧪 Test Registration Form</h2>
+        <p>Fill out this form to test the registration system:</p>
+
+        <form id="testForm">
+            <div class="form-group">
+                <label>Account Type:</label>
+                <select id="userType" required>
+                    <option value="">Select Account Type</option>
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="examiner">Examiner</option>
+                </select>
+            </div>
+
+            <div id="examLevelSection" style="display: none;">
+                <label>Exam Level (Students Only):</label>
+                <div class="exam-level">
+                    <button type="button" id="oLevel">O Level</button>
+                    <button type="button" id="aLevel">A Level</button>
+                </div>
+                <input type="hidden" id="examLevel" name="examLevel">
+            </div>
+
+            <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password *</label>
+                <input type="password" id="confirmPassword" required>
+            </div>
+
+            <div id="studentFields" style="display: none;">
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth *</label>
+                    <input type="date" id="dateOfBirth">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender *</label>
+                    <select id="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number *</label>
+                    <input type="tel" id="phoneNumber" placeholder="+237 6XX XXX XXX">
+                </div>
+
+                <div class="form-group">
+                    <label for="region">Region *</label>
+                    <select id="region">
+                        <option value="">Select Region</option>
+                        <option value="Adamawa">Adamawa</option>
+                        <option value="Centre">Centre</option>
+                        <option value="East">East</option>
+                        <option value="Far North">Far North</option>
+                        <option value="Littoral">Littoral</option>
+                        <option value="North">North</option>
+                        <option value="Northwest">Northwest</option>
+                        <option value="South">South</option>
+                        <option value="Southwest">Southwest</option>
+                        <option value="West">West</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="schoolCenterNumber">School Center Number *</label>
+                    <input type="text" id="schoolCenterNumber" placeholder="001, 002, 003...">
+                </div>
+
+                <div class="form-group">
+                    <label for="candidateNumber">Candidate Number *</label>
+                    <input type="text" id="candidateNumber" placeholder="Your candidate number">
+                </div>
+            </div>
+
+            <div id="teacherFields" style="display: none;">
+                <div class="form-group">
+                    <label for="school">School/Institution *</label>
+                    <input type="text" id="school" placeholder="Your school or institution">
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Create Account</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const userTypeSelect = document.getElementById('userType');
+        const examLevelSection = document.getElementById('examLevelSection');
+        const studentFields = document.getElementById('studentFields');
+        const teacherFields = document.getElementById('teacherFields');
+        const oLevelBtn = document.getElementById('oLevel');
+        const aLevelBtn = document.getElementById('aLevel');
+        const examLevelInput = document.getElementById('examLevel');
+        const form = document.getElementById('testForm');
+        const result = document.getElementById('result');
+
+        // Handle user type change
+        userTypeSelect.addEventListener('change', function() {
+            const userType = this.value;
+
+            // Hide all conditional fields
+            examLevelSection.style.display = 'none';
+            studentFields.style.display = 'none';
+            teacherFields.style.display = 'none';
+
+            // Show relevant fields
+            if (userType === 'student') {
+                examLevelSection.style.display = 'block';
+                studentFields.style.display = 'block';
+            } else if (userType === 'teacher') {
+                teacherFields.style.display = 'block';
+            }
+        });
+
+        // Handle exam level selection
+        oLevelBtn.addEventListener('click', function() {
+            oLevelBtn.classList.add('selected');
+            aLevelBtn.classList.remove('selected');
+            examLevelInput.value = 'O Level';
+        });
+
+        aLevelBtn.addEventListener('click', function() {
+            aLevelBtn.classList.add('selected');
+            oLevelBtn.classList.remove('selected');
+            examLevelInput.value = 'A Level';
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+
+            // Collect form data
+            const formData = {
+                userType: document.getElementById('userType').value,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value
+            };
+
+            // Add student-specific fields
+            if (formData.userType === 'student') {
+                formData.examLevel = document.getElementById('examLevel').value;
+                formData.dateOfBirth = document.getElementById('dateOfBirth').value;
+                formData.gender = document.getElementById('gender').value;
+                formData.phoneNumber = document.getElementById('phoneNumber').value;
+                formData.region = document.getElementById('region').value;
+                formData.schoolCenterNumber = document.getElementById('schoolCenterNumber').value;
+                formData.candidateNumber = document.getElementById('candidateNumber').value;
+            }
+
+            // Add teacher-specific fields
+            if (formData.userType === 'teacher') {
+                formData.school = document.getElementById('school').value;
+            }
+
+            try {
+                console.log('Sending registration data:', formData);
+
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const responseData = await response.json();
+                console.log('Registration response:', responseData);
+
+                if (responseData.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Registration Successful!</h3>
+                            <p><strong>User ID:</strong> ${responseData.data.id}</p>
+                            <p><strong>Email:</strong> ${responseData.data.email}</p>
+                            <p><strong>User Type:</strong> ${responseData.data.userType}</p>
+                            ${formData.examLevel ? `<p><strong>Exam Level:</strong> ${formData.examLevel}</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Registration Failed</h3>
+                            <p>${responseData.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network Error</h3>
+                        <p>Failed to connect to the server. Please check the console for details.</p>
+                    </div>
+                `;
+            } finally {
+                submitBtn.textContent = 'Create Account';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Pre-fill with test data
+        document.getElementById('fullName').value = 'Test Student';
+        document.getElementById('email').value = 'test.student@example.com';
+        document.getElementById('password').value = 'TestPass123!';
+        document.getElementById('confirmPassword').value = 'TestPass123!';
+        document.getElementById('dateOfBirth').value = '2005-01-15';
+        document.getElementById('phoneNumber').value = '+237676123456';
+        document.getElementById('schoolCenterNumber').value = '001';
+        document.getElementById('candidateNumber').value = 'TEST2025001';
+    </script>
+</body>
+</html>

@@ -18,6 +18,8 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
+import ProfilePicture from '@/components/ProfilePicture';
 
 interface NavigationItem {
   name: string;
@@ -37,6 +39,9 @@ function StudentLayout({ children }: StudentLayoutProps) {
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const pathname = usePathname();
   const router = useRouter();
+
+  // Get real-time user data
+  const { user, logout } = useUser();
 
   // Translation function
   const t = useCallback((en: string, fr: string) => language === 'en' ? en : fr, [language]);
@@ -91,6 +96,14 @@ function StudentLayout({ children }: StudentLayoutProps) {
       icon: Award,
       current: pathname === '/Student/certificate',
     },
+    {
+      name: t('Profile', 'Profil'),
+      nameEn: 'Profile',
+      nameFr: 'Profil',
+      href: '/Student/profile',
+      icon: User,
+      current: pathname === '/Student/profile',
+    },
   ], [pathname, t]);
 
   const userNavigation = useMemo(() => [
@@ -104,9 +117,9 @@ function StudentLayout({ children }: StudentLayoutProps) {
   }, []);
 
   const handleLogout = useCallback(() => {
-    // Add logout logic here
-    router.push('/auth/Login');
-  }, [router]);
+    // Use context logout function
+    logout();
+  }, [logout]);
 
   const closeSidebar = useCallback(() => {
     setSidebarOpen(false);
@@ -276,12 +289,27 @@ function StudentLayout({ children }: StudentLayoutProps) {
                   <button
                     type="button"
                     className="flex items-center gap-x-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    onClick={() => router.push('/common/profile')}
+                    onClick={() => router.push('/Student/profile')}
                   >
-                    <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                      <User className="h-6 w-6 text-gray-600" />
-                    </div>
-                    <span className="hidden lg:block">{t('Profile', 'Profil')}</span>
+                    {user ? (
+                      <ProfilePicture
+                        userId={user.id}
+                        userType={user.userType}
+                        examLevel={user.examLevel}
+                        userName={user.fullName}
+                        profilePicturePath={user.profilePicturePath}
+                        size="sm"
+                        editable={false}
+                        className="h-8 w-8"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <User className="h-6 w-6 text-gray-600" />
+                      </div>
+                    )}
+                    <span className="hidden lg:block">
+                      {user?.fullName || t('Profile', 'Profil')}
+                    </span>
                   </button>
                 </div>
 

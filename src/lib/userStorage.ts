@@ -3,6 +3,7 @@
 
 import crypto from 'crypto';
 import { postgresDb } from './postgresDb';
+import { SeparateStudentDatabase } from './separateStudentDb';
 
 // User interface
 export interface User {
@@ -28,9 +29,16 @@ export interface User {
   lastLogin?: string;
 }
 
-// Hash password function
+// Hash password function (legacy - use bcrypt for new users)
 export const hashPassword = (password: string): string => {
   return crypto.createHash('sha256').update(password).digest('hex');
+};
+
+// Bcrypt hash function for new users
+export const hashPasswordBcrypt = async (password: string): Promise<string> => {
+  const bcrypt = require('bcryptjs');
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
 };
 
 // Separate in-memory storage for each user type (in production, these would be separate databases)
@@ -185,8 +193,44 @@ export const userStorage = {
     return user;
   },
 
-  // Find user by email (async - searches all schemas)
+  // Find user by email (async - searches all schemas including separate student databases)
   findByEmail: async (email: string): Promise<User | null> => {
+    // First check student databases
+    const studentResult = await SeparateStudentDatabase.findStudentByEmail(email);
+    if (studentResult) {
+      const { student, examLevel } = studentResult;
+      // Convert to User interface format
+      return {
+        id: student.id,
+        fullName: student.fullName,
+        email: student.email,
+        userType: 'student',
+        passwordHash: student.passwordHash,
+        registrationStatus: student.registrationStatus,
+        emailVerified: student.emailVerified,
+        examLevel: examLevel,
+        examCenter: student.examCenter,
+        centerCode: student.centerCode,
+        candidateNumber: student.candidateNumber,
+        dateOfBirth: student.dateOfBirth,
+        subjects: student.oLevelSubjects || student.aLevelSubjects || [],
+        createdAt: student.createdAt,
+        lastLogin: student.lastLogin,
+        // Additional student fields for profile display
+        gender: student.gender,
+        phoneNumber: student.phoneNumber,
+        region: student.region,
+        schoolCenterNumber: student.schoolCenterNumber,
+        parentGuardianName: student.parentGuardianName,
+        parentGuardianPhone: student.parentGuardianPhone,
+        emergencyContactName: student.emergencyContactName,
+        emergencyContactPhone: student.emergencyContactPhone,
+        previousSchool: student.previousSchool,
+        profilePicturePath: student.profilePicturePath
+      };
+    }
+
+    // Then check other user types
     return await postgresDb.findByEmail(email);
   },
 
@@ -233,7 +277,103 @@ export const userStorage = {
 
   // Get users by type (async - secure method)
   getUsersByType: async (userType: User['userType']): Promise<User[]> => {
-    return await postgresDb.getUsersByType(userType);
+    if (userType === 'student') {
+      // For students, get from both O Level and A Level databases
+      const [oLevelStudents, aLevelStudents] = await Promise.all([
+        SeparateStudentDatabase.getAllOLevelStudents(),
+        SeparateStudentDatabase.getAllALevelStudents()
+      ]);
+
+      // Convert to User interface format
+      const convertStudent = (student: any, examLevel: 'O Level' | 'A Level'): User => ({
+        id: student.id,
+        fullName: student.fullName,
+        email: student.email,
+        userType: 'student',
+        passwordHash: student.passwordHash,
+        registrationStatus: student.registrationStatus,
+        emailVerified: student.emailVerified,
+        examLevel: examLevel,
+        examCenter: student.examCenter,
+        centerCode: student.centerCode,
+        candidateNumber: student.candidateNumber,
+        dateOfBirth: student.dateOfBirth,
+        subjects: student.oLevelSubjects || student.aLevelSubjects || [],
+        createdAt: student.createdAt,
+        lastLogin: student.lastLogin
+      });
+
+      return [
+        ...oLevelStudents.map(s => convertStudent(s, 'O Level')),
+        ...aLevelStudents.map(s => convertStudent(s, 'A Level'))
+      ];
+    } else {
+      return await postgresDb.getUsersByType(userType);
+    }
+  },
+
+  // Create user (async - uses PostgreSQL with separate student databases)
+  createUser: async (userData: Partial<User>): Promise<User> => {
+    // If it's a student, use the separate student database system
+    if (userData.userType === 'student') {
+      const studentData = {
+        fullName: userData.fullName || '',
+        email: userData.email || '',
+        password: userData.password || '',
+        examLevel: userData.examLevel as 'O Level' | 'A Level',
+        dateOfBirth: userData.dateOfBirth || '',
+        gender: userData.gender || '',
+        phoneNumber: userData.phoneNumber || '',
+        region: userData.region || '',
+        schoolCenterNumber: userData.schoolCenterNumber || '',
+        candidateNumber: userData.candidateNumber || '',
+        parentGuardianName: userData.parentGuardianName || '',
+        parentGuardianPhone: userData.parentGuardianPhone || '',
+        emergencyContactName: userData.emergencyContactName || '',
+        emergencyContactPhone: userData.emergencyContactPhone || '',
+        previousSchool: userData.previousSchool || '',
+        securityQuestion: userData.securityQuestion || '',
+        securityAnswer: userData.securityAnswer || '',
+        // Optional fields
+        nationalIdNumber: userData.nationalIdNumber,
+        placeOfBirth: userData.placeOfBirth,
+        division: userData.division,
+        currentAddress: userData.currentAddress,
+        parentGuardianRelation: userData.parentGuardianRelation,
+        emergencyContactRelation: userData.emergencyContactRelation,
+        previousSchoolRegion: userData.previousSchoolRegion,
+        yearOfCompletion: userData.yearOfCompletion,
+        profilePicturePath: userData.profilePicturePath,
+        // A Level specific
+        oLevelResults: userData.oLevelResults,
+        universityChoices: userData.universityChoices,
+        careerPath: userData.careerPath
+      };
+
+      const newStudent = await SeparateStudentDatabase.createStudent(studentData);
+
+      // Convert to User interface format
+      return {
+        id: newStudent.id,
+        fullName: newStudent.fullName,
+        email: newStudent.email,
+        userType: 'student',
+        passwordHash: newStudent.passwordHash,
+        registrationStatus: newStudent.registrationStatus,
+        emailVerified: newStudent.emailVerified,
+        examLevel: userData.examLevel,
+        examCenter: userData.examCenter,
+        centerCode: newStudent.centerCode,
+        candidateNumber: newStudent.candidateNumber,
+        dateOfBirth: newStudent.dateOfBirth,
+        subjects: newStudent.oLevelSubjects || newStudent.aLevelSubjects || [],
+        createdAt: newStudent.createdAt,
+        lastLogin: newStudent.lastLogin
+      };
+    } else {
+      // For teachers and examiners, use the original PostgreSQL system
+      return await postgresDb.createUser(userData);
+    }
   },
 
   // Legacy sync versions
@@ -282,12 +422,21 @@ export const userStorage = {
     return false;
   },
 
-  // Verify password (async - searches all schemas)
+  // Verify password (async - searches all schemas including separate student databases)
   verifyPassword: async (email: string, password: string): Promise<boolean> => {
+    // First check student databases
+    const studentResult = await SeparateStudentDatabase.verifyStudentPassword(email, password);
+    if (studentResult.valid) {
+      return true;
+    }
+
+    // Then check other user types
     const user = await postgresDb.findByEmail(email);
     if (!user) return false;
-    const hashedInput = hashPassword(password);
-    return hashedInput === user.passwordHash;
+
+    // Use bcrypt to verify password (consistent with PostgreSQL implementation)
+    const bcrypt = require('bcryptjs');
+    return await bcrypt.compare(password, user.passwordHash);
   },
 
   // Verify password by user type (async - secure method)
@@ -295,20 +444,38 @@ export const userStorage = {
     return await postgresDb.verifyPasswordByType(email, password, userType);
   },
 
-  // Legacy sync versions
+  // Legacy sync versions (Note: These should be avoided, use async versions)
   verifyPasswordSync: (email: string, password: string): boolean => {
     const user = userStorage.findByEmailSync(email);
     if (!user) return false;
-    const hashedInput = hashPassword(password);
-    return hashedInput === user.passwordHash;
+
+    // For legacy users that might still use SHA256, try both methods
+    const bcrypt = require('bcryptjs');
+    try {
+      // Try bcrypt first (new method)
+      return bcrypt.compareSync(password, user.passwordHash);
+    } catch {
+      // Fallback to SHA256 for legacy users
+      const hashedInput = hashPassword(password);
+      return hashedInput === user.passwordHash;
+    }
   },
 
   verifyPasswordByTypeSync: (email: string, password: string, userType: User['userType']): boolean => {
     const storage = getUserStorage(userType);
     const user = storage.get(email.toLowerCase());
     if (!user) return false;
-    const hashedInput = hashPassword(password);
-    return hashedInput === user.passwordHash;
+
+    // For legacy users that might still use SHA256, try both methods
+    const bcrypt = require('bcryptjs');
+    try {
+      // Try bcrypt first (new method)
+      return bcrypt.compareSync(password, user.passwordHash);
+    } catch {
+      // Fallback to SHA256 for legacy users
+      const hashedInput = hashPassword(password);
+      return hashedInput === user.passwordHash;
+    }
   },
 
   // Update last login
